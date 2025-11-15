@@ -88,6 +88,7 @@ const DashboardCharts = memo(function DashboardCharts({
 
   const productivityTrendData = dailyLogs
     ? dailyLogs
+        .sort((a, b) => a.date - b.date)
         .slice(-14)
         .map((log) => ({
           date: new Date(log.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
@@ -102,18 +103,24 @@ const DashboardCharts = memo(function DashboardCharts({
   }));
 
   const workoutTrendData = workoutStats?.workouts
-    ? workoutStats.workouts.slice(-10).map((workout: any) => ({
-        date: new Date(workout.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-        duration: workout.duration || 0,
-        calories: workout.calories || 0,
-      }))
+    ? workoutStats.workouts
+        .sort((a: any, b: any) => a.date - b.date)
+        .slice(-10)
+        .map((workout: any) => ({
+          date: new Date(workout.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          duration: workout.duration || 0,
+          calories: workout.calories || 0,
+        }))
     : [];
 
   const sleepTrendData = sleepLogs
-    ? sleepLogs.slice(-14).map((log) => ({
-        date: new Date(log.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-        hours: log.duration,
-      }))
+    ? sleepLogs
+        .sort((a, b) => a.date - b.date)
+        .slice(-14)
+        .map((log) => ({
+          date: new Date(log.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          hours: log.duration,
+        }))
     : [];
 
   return (
