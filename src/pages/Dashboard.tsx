@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useNavigate } from "react-router";
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, useMemo, lazy, Suspense } from "react";
 import { TrialBanner } from "@/components/TrialBanner";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { motion } from "framer-motion";
@@ -38,53 +38,60 @@ export default function Dashboard() {
     }
   }, [isLoading, isAuthenticated, navigate]);
 
-  // Calculate date ranges
-  const now = new Date();
-  const startDate = new Date(now);
-  if (timeRange === "week") {
-    startDate.setDate(now.getDate() - 7);
-  } else if (timeRange === "month") {
-    startDate.setDate(now.getDate() - 30);
-  } else {
-    startDate.setFullYear(now.getFullYear() - 1);
-  }
-  startDate.setHours(0, 0, 0, 0);
+  // Calculate date ranges - memoized to prevent infinite loops
+  const { startDate: startDateTime, endDateTime } = useMemo(() => {
+    const now = new Date();
+    const startDate = new Date(now);
+    if (timeRange === "week") {
+      startDate.setDate(now.getDate() - 7);
+    } else if (timeRange === "month") {
+      startDate.setDate(now.getDate() - 30);
+    } else {
+      startDate.setFullYear(now.getFullYear() - 1);
+    }
+    startDate.setHours(0, 0, 0, 0);
+    
+    return {
+      startDate: startDate.getTime(),
+      endDateTime: now.getTime(),
+    };
+  }, [timeRange]);
 
   // Fetch all data
   const tasks = useQuery(api.tasks.list, {});
   const taskStats = useQuery(api.tasks.getStats, {
-    startDate: startDate.getTime(),
-    endDate: now.getTime(),
+    startDate: startDateTime,
+    endDate: endDateTime,
   });
   const dailyLogs = useQuery(api.dailyLogs.list, {
-    startDate: startDate.getTime(),
-    endDate: now.getTime(),
+    startDate: startDateTime,
+    endDate: endDateTime,
   });
   const dailyStats = useQuery(api.dailyLogs.getStats, {
-    startDate: startDate.getTime(),
-    endDate: now.getTime(),
+    startDate: startDateTime,
+    endDate: endDateTime,
   });
   const habits = useQuery(api.habits.list, {});
   const books = useQuery(api.books.list, {});
   const readingStats = useQuery(api.books.getReadingStats, {
-    startDate: startDate.getTime(),
-    endDate: now.getTime(),
+    startDate: startDateTime,
+    endDate: endDateTime,
   });
   const financeStats = useQuery(api.finance.getFinanceStats, {
-    startDate: startDate.getTime(),
-    endDate: now.getTime(),
+    startDate: startDateTime,
+    endDate: endDateTime,
   });
   const workoutStats = useQuery(api.workouts.getStats, {
-    startDate: startDate.getTime(),
-    endDate: now.getTime(),
+    startDate: startDateTime,
+    endDate: endDateTime,
   });
   const waterLogs = useQuery(api.health.listWater, {
-    startDate: startDate.getTime(),
-    endDate: now.getTime(),
+    startDate: startDateTime,
+    endDate: endDateTime,
   });
   const sleepLogs = useQuery(api.health.listSleep, {
-    startDate: startDate.getTime(),
-    endDate: now.getTime(),
+    startDate: startDateTime,
+    endDate: endDateTime,
   });
 
   if (isLoading || !user) {
@@ -189,8 +196,8 @@ export default function Dashboard() {
                   readingStats={readingStats}
                   books={books || []}
                   filters={filters}
-                  startDate={startDate.getTime()}
-                  endDate={now.getTime()}
+                  startDate={startDateTime}
+                  endDate={endDateTime}
                 />
               </Suspense>
 
@@ -202,8 +209,8 @@ export default function Dashboard() {
                   workoutStats={workoutStats}
                   sleepLogs={sleepLogs || []}
                   filters={filters}
-                  startDate={startDate.getTime()}
-                  endDate={now.getTime()}
+                  startDate={startDateTime}
+                  endDate={endDateTime}
                 />
               </Suspense>
 
@@ -212,8 +219,8 @@ export default function Dashboard() {
                   habits={(habits || []).filter((habit) => {
                     return filters.habitFrequencyFilter === "all" || habit.frequency === filters.habitFrequencyFilter;
                   })} 
-                  startDate={startDate.getTime()} 
-                  endDate={now.getTime()} 
+                  startDate={startDateTime} 
+                  endDate={endDateTime} 
                 />
               </Suspense>
             </>
