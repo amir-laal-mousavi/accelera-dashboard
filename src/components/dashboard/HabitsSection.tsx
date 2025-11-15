@@ -30,11 +30,14 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("name");
 
-  // Get aggregated stats - pass args directly to ensure stability
-  const aggregatedStats = useQuery(api.habits.getAggregatedStats, {
+  // Memoize query args to prevent infinite loops
+  const queryArgs = useMemo(() => ({
     startDate,
     endDate,
-  });
+  }), [startDate, endDate]);
+
+  // Get aggregated stats
+  const aggregatedStats = useQuery(api.habits.getAggregatedStats, queryArgs);
 
   // Memoize filtered and sorted habits to prevent infinite loops
   const filteredHabits = useMemo(() => {
