@@ -13,6 +13,7 @@ import { BookForm } from "./BookForm";
 import { HabitCreationForm } from "./HabitCreationForm";
 import { DailyLogForm } from "./DailyLogForm";
 import { HealthLogForm } from "./HealthLogForm";
+import { CalorieCalculator } from "./CalorieCalculator";
 import { toast } from "sonner";
 import {
   BarChart,
@@ -469,7 +470,10 @@ const DailyView = memo(function DailyView() {
                 <CardTitle>Workouts</CardTitle>
                 <CardDescription>{workouts?.length || 0} sessions today</CardDescription>
               </div>
-              <WorkoutForm />
+              <div className="flex items-center gap-2">
+                <CalorieCalculator />
+                <WorkoutForm />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
