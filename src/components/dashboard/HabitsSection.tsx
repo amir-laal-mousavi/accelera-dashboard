@@ -37,10 +37,11 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
     endDate,
   }), [startDate, endDate]);
 
-  // Get aggregated stats - only when needed
+  // Get aggregated stats - only when on overview tab
+  const shouldFetchStats = activeTab === "overview";
   const aggregatedStats = useQuery(
     api.habits.getAggregatedStats, 
-    activeTab === "overview" ? queryArgs : "skip"
+    shouldFetchStats ? queryArgs : "skip"
   );
 
   // Memoize filtered and sorted habits to prevent infinite loops
@@ -151,7 +152,7 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
           </div>
         )}
 
-        <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="heatmaps">Heatmaps</TabsTrigger>
@@ -201,15 +202,21 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
           </TabsContent>
 
           <TabsContent value="heatmaps" className="space-y-6">
-            {activeTab === "heatmaps" && filteredHabits.map((habit) => (
-              <HabitHeatmap
-                key={habit._id}
-                habitId={habit._id}
-                habitName={habit.name}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            ))}
+            {activeTab === "heatmaps" && (
+              filteredHabits.length > 0 ? (
+                filteredHabits.map((habit) => (
+                  <HabitHeatmap
+                    key={habit._id}
+                    habitId={habit._id}
+                    habitName={habit.name}
+                    startDate={startDate}
+                    endDate={endDate}
+                  />
+                ))
+              ) : (
+                <p className="text-center text-muted-foreground py-8">No habits to display</p>
+              )
+            )}
           </TabsContent>
         </Tabs>
       </CardContent>
