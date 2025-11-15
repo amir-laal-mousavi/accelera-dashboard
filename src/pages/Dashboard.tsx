@@ -31,6 +31,8 @@ import {
 } from "recharts";
 import { HabitsSection } from "@/components/dashboard/HabitsSection";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LogoDropdown } from "@/components/LogoDropdown";
+import { useMobile } from "@/hooks/use-mobile";
 
 export default function Dashboard() {
   const { isLoading, isAuthenticated, user, signOut } = useAuth();
@@ -212,30 +214,31 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <img src="./logo.svg" alt="Logo" className="h-10 w-10 cursor-pointer" onClick={() => navigate("/")} />
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">ACCELERA Dashboard</h1>
-              <p className="text-sm text-muted-foreground">Welcome back, {user.name || user.email || "User"}</p>
+      <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+        <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 md:gap-4">
+            <img src="./logo.svg" alt="Logo" className="h-8 w-8 md:h-10 md:w-10 cursor-pointer" onClick={() => navigate("/")} />
+            <div className="hidden sm:block">
+              <h1 className="text-lg md:text-2xl font-bold tracking-tight">ACCELERA Dashboard</h1>
+              <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Welcome back, {user.name || user.email || "User"}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button variant="outline" onClick={() => signOut()}>
+            <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => signOut()}>
               Sign Out
             </Button>
+            <LogoDropdown />
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-4 md:py-8 pb-20 md:pb-8">
         <TrialBanner />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mt-4">
           {/* Time Range Selector */}
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="flex items-center gap-2">
               <Filter className="h-5 w-5 text-muted-foreground" />
               <span className="text-sm font-medium">Filters Active</span>
@@ -252,7 +255,7 @@ export default function Dashboard() {
           {/* Filter Controls */}
           <Card className="mb-6 border-2">
             <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <CardTitle className="text-xl">Data Filters</CardTitle>
                   <CardDescription className="mt-1">Refine your dashboard data by various criteria</CardDescription>
@@ -276,7 +279,7 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {/* Task Filters */}
                 <div className="space-y-2 p-4 rounded-lg border bg-card/50">
                   <div className="flex items-center gap-2 mb-3">
@@ -411,7 +414,7 @@ export default function Dashboard() {
           ) : (
             <>
               {/* Quick Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 md:mb-8">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Task Completion</CardTitle>
@@ -481,7 +484,7 @@ export default function Dashboard() {
               </div>
 
               {/* Charts Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 {/* Task Completion Pie Chart */}
                 <Card>
                   <CardHeader>
