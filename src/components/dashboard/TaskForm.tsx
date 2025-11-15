@@ -35,9 +35,9 @@ interface TaskFormProps {
 export function TaskForm({ task }: TaskFormProps) {
   const [open, setOpen] = useState(false);
   const [taskName, setTaskName] = useState("");
-  const [status, setStatus] = useState("To Do");
+  const [status, setStatus] = useState("Not Started");
   const [priority, setPriority] = useState("Medium");
-  const [area, setArea] = useState("Personal");
+  const [area, setArea] = useState("Work");
   const [scheduled, setScheduled] = useState("");
   const [deadline, setDeadline] = useState("");
   const [notes, setNotes] = useState("");
@@ -56,9 +56,9 @@ export function TaskForm({ task }: TaskFormProps) {
     } else if (!task && open) {
       // Reset for new task
       setTaskName("");
-      setStatus("To Do");
+      setStatus("Not Started");
       setPriority("Medium");
-      setArea("Personal");
+      setArea("Work");
       setScheduled("");
       setDeadline("");
       setNotes("");
@@ -163,9 +163,10 @@ export function TaskForm({ task }: TaskFormProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="To Do">To Do</SelectItem>
+                  <SelectItem value="Not Started">Not Started</SelectItem>
                   <SelectItem value="In Progress">In Progress</SelectItem>
                   <SelectItem value="Done">Done</SelectItem>
+                  <SelectItem value="Blocked">Blocked</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -192,10 +193,17 @@ export function TaskForm({ task }: TaskFormProps) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Personal">Personal</SelectItem>
                 <SelectItem value="Work">Work</SelectItem>
-                <SelectItem value="Health">Health</SelectItem>
-                <SelectItem value="Learning">Learning</SelectItem>
+                <SelectItem value="Study">Study</SelectItem>
+                <SelectItem value="Programming">Programming</SelectItem>
+                <SelectItem value="Fitness">Fitness</SelectItem>
+                <SelectItem value="Finance">Finance</SelectItem>
+                <SelectItem value="Book">Book</SelectItem>
+                <SelectItem value="Studying">Studying</SelectItem>
+                <SelectItem value="Self">Self</SelectItem>
+                <SelectItem value="Research">Research</SelectItem>
+                <SelectItem value="Startup">Startup</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
               </SelectContent>
             </Select>
           </div>
