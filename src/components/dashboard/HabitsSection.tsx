@@ -39,34 +39,41 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
   // Get aggregated stats
   const aggregatedStats = useQuery(api.habits.getAggregatedStats, statsArgs);
 
-  // Filter habits
-  let filteredHabits = habits.filter((h) => {
-    if (categoryFilter === "all") return true;
-    return h.category === categoryFilter;
-  });
+  // Memoize filtered and sorted habits to prevent infinite loops
+  const filteredHabits = useMemo(() => {
+    // Filter habits
+    let filtered = habits.filter((h) => {
+      if (categoryFilter === "all") return true;
+      return h.category === categoryFilter;
+    });
 
-  // Sort habits - simplified without individual stats
-  filteredHabits = [...filteredHabits].sort((a, b) => {
-    switch (sortBy) {
-      case "name":
-        return a.name.localeCompare(b.name);
-      case "name-desc":
-        return b.name.localeCompare(a.name);
-      case "date":
-        return (b.startDate || 0) - (a.startDate || 0);
-      case "date-old":
-        return (a.startDate || 0) - (b.startDate || 0);
-      case "streak":
-      case "completion":
-        // For now, sort by name when stats-based sorting is selected
-        // Individual stats queries were causing infinite loops
-        return a.name.localeCompare(b.name);
-      default:
-        return 0;
-    }
-  });
+    // Sort habits
+    filtered = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "name":
+          return a.name.localeCompare(b.name);
+        case "name-desc":
+          return b.name.localeCompare(a.name);
+        case "date":
+          return (b.startDate || 0) - (a.startDate || 0);
+        case "date-old":
+          return (a.startDate || 0) - (b.startDate || 0);
+        case "streak":
+        case "completion":
+          // For now, sort by name when stats-based sorting is selected
+          // Individual stats queries were causing infinite loops
+          return a.name.localeCompare(b.name);
+        default:
+          return 0;
+      }
+    });
 
-  const categories = Array.from(new Set(habits.map((h) => h.category).filter(Boolean))) as string[];
+    return filtered;
+  }, [habits, categoryFilter, sortBy]);
+
+  const categories = useMemo(() => {
+    return Array.from(new Set(habits.map((h) => h.category).filter(Boolean))) as string[];
+  }, [habits]);
   
   if (filteredHabits.length === 0) {
     return (
