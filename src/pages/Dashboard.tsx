@@ -23,7 +23,14 @@ const DailyView = lazy(() => import("@/components/dashboard/DailyView"));
 export default function Dashboard() {
   const { isLoading, isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
+  // Force Daily as default - no conditional logic
   const [timeRange, setTimeRange] = useState<"daily" | "week" | "month" | "year">("daily");
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Ensure Daily tab is always rendered first, even before data loads
+  useEffect(() => {
+    setIsInitialized(true);
+  }, []);
   
   // Filter states
   const [taskAreaFilter, setTaskAreaFilter] = useState<string>("all");
@@ -105,6 +112,7 @@ export default function Dashboard() {
     });
   }, [habits, habitFrequencyFilter]);
 
+  // Show loading only for auth, not for data
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -113,6 +121,7 @@ export default function Dashboard() {
     );
   }
 
+  // Allow rendering even if data is still loading - Daily tab must show immediately
   const isDataLoading = !tasks || !taskStats || !dailyLogs || !habits || !books || !financeStats || !workoutStats;
 
   const filters = {
@@ -169,26 +178,29 @@ export default function Dashboard() {
       <main className="container mx-auto px-4 py-4 md:py-8 pb-20 md:pb-8">
         <TrialBanner />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mt-4">
-          {/* Time Range Selector - Daily is now first and emphasized */}
+          {/* Time Range Selector - Daily is ALWAYS first and emphasized with neon glow */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="flex items-center gap-2">
               <Filter className="h-5 w-5 text-muted-foreground" />
               <span className="text-sm font-medium">View Mode</span>
             </div>
-            <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
-              <TabsList>
-                <TabsTrigger value="daily" className={timeRange === "daily" ? "tab-active-glow" : ""}>
+            <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)} className="neon-tabs">
+              <TabsList className="bg-card/50 backdrop-blur-sm border border-border/50">
+                <TabsTrigger 
+                  value="daily" 
+                  className={timeRange === "daily" ? "neon-tab-active" : "hover:bg-accent/30 transition-all"}
+                >
                   Daily
                 </TabsTrigger>
-                <TabsTrigger value="week">Week</TabsTrigger>
-                <TabsTrigger value="month">Month</TabsTrigger>
-                <TabsTrigger value="year">Year</TabsTrigger>
+                <TabsTrigger value="week" className="hover:bg-accent/30 transition-all">Week</TabsTrigger>
+                <TabsTrigger value="month" className="hover:bg-accent/30 transition-all">Month</TabsTrigger>
+                <TabsTrigger value="year" className="hover:bg-accent/30 transition-all">Year</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
 
-          {/* Conditional rendering based on view mode */}
-          {showDailyView ? (
+          {/* ALWAYS render Daily view first - no conditional delays */}
+          {timeRange === "daily" ? (
             <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
               <DailyView />
             </Suspense>

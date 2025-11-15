@@ -164,8 +164,8 @@ const DailyView = memo(function DailyView() {
 
   return (
     <div className="space-y-6">
-      {/* Date Navigation */}
-      <Card className="border-2 border-accent-teal/20">
+      {/* Date Navigation with neon accent */}
+      <Card className="border-2 border-accent-teal/20 neon-card-hover">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -196,9 +196,9 @@ const DailyView = memo(function DailyView() {
         </CardHeader>
       </Card>
 
-      {/* Quick Stats */}
+      {/* Quick Stats with neon highlights */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card className="neon-card-hover">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Tasks</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
@@ -209,7 +209,7 @@ const DailyView = memo(function DailyView() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="neon-card-hover">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Water Intake</CardTitle>
             <Droplet className="h-4 w-4 text-muted-foreground" />
@@ -222,7 +222,7 @@ const DailyView = memo(function DailyView() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="neon-card-hover">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Workout</CardTitle>
             <Dumbbell className="h-4 w-4 text-muted-foreground" />
@@ -235,7 +235,7 @@ const DailyView = memo(function DailyView() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="neon-card-hover">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Reading</CardTitle>
             <BookIcon className="h-4 w-4 text-muted-foreground" />
@@ -249,9 +249,9 @@ const DailyView = memo(function DailyView() {
         </Card>
       </div>
 
-      {/* Charts Row */}
+      {/* Charts Row with neon ambient glow */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="neon-card-hover chart-gradient-teal">
           <CardHeader>
             <CardTitle>Tasks by Area</CardTitle>
             <CardDescription>Distribution for today</CardDescription>
@@ -269,7 +269,7 @@ const DailyView = memo(function DailyView() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="neon-card-hover chart-gradient-purple">
           <CardHeader>
             <CardTitle>Time Distribution</CardTitle>
             <CardDescription>How you spent your day</CardDescription>
