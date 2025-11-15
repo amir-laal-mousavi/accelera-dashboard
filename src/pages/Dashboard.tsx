@@ -28,6 +28,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { HabitsSection } from "@/components/dashboard/HabitsSection";
 
 export default function Dashboard() {
   const { isLoading, isAuthenticated, user, signOut } = useAuth();
@@ -583,32 +584,12 @@ export default function Dashboard() {
                 </Card>
               </div>
 
-              {/* Habits Overview */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Active Habits</CardTitle>
-                  <CardDescription>Your current habit tracking (Filtered: {filteredHabits.length} habits)</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredHabits.length > 0 ? (
-                      filteredHabits.map((habit) => (
-                        <div key={habit._id} className="p-4 border rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold">{habit.name}</h4>
-                            <Badge style={{ backgroundColor: habit.color || "#8b5cf6" }}>
-                              {habit.frequency}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">{habit.description}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-muted-foreground col-span-full text-center py-4">No habits match the current filter</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Habits Overview with Heatmaps */}
+              <HabitsSection 
+                habits={filteredHabits} 
+                startDate={startDate.getTime()} 
+                endDate={now.getTime()} 
+              />
 
               {/* Books Overview */}
               <Card className="mt-6">
