@@ -22,7 +22,7 @@ const HabitsSection = lazy(() => import("@/components/dashboard/HabitsSection"))
 export default function Dashboard() {
   const { isLoading, isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [timeRange, setTimeRange] = useState<"week" | "month" | "year">("month");
+  const [timeRange, setTimeRange] = useState<"day" | "week" | "month" | "year">("month");
   
   // Filter states
   const [taskAreaFilter, setTaskAreaFilter] = useState<string>("all");
@@ -42,7 +42,9 @@ export default function Dashboard() {
   const { startDate: startDateTime, endDateTime } = useMemo(() => {
     const now = new Date();
     const startDate = new Date(now);
-    if (timeRange === "week") {
+    if (timeRange === "day") {
+      startDate.setHours(0, 0, 0, 0);
+    } else if (timeRange === "week") {
       startDate.setDate(now.getDate() - 7);
     } else if (timeRange === "month") {
       startDate.setDate(now.getDate() - 30);
@@ -171,6 +173,7 @@ export default function Dashboard() {
             </div>
             <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
               <TabsList>
+                <TabsTrigger value="day">Day</TabsTrigger>
                 <TabsTrigger value="week">Week</TabsTrigger>
                 <TabsTrigger value="month">Month</TabsTrigger>
                 <TabsTrigger value="year">Year</TabsTrigger>

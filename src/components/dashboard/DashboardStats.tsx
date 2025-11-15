@@ -2,6 +2,10 @@ import { memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Brain, DollarSign, Book, TrendingUp, TrendingDown } from "lucide-react";
+import { TaskForm } from "./TaskForm";
+import { ExpenseForm } from "./ExpenseForm";
+import { WorkoutForm } from "./WorkoutForm";
+import { BookForm } from "./BookForm";
 
 interface DashboardStatsProps {
   tasks: any[];
@@ -53,11 +57,11 @@ const DashboardStats = memo(function DashboardStats({
   const filteredExpenseTotal = filteredExpenses.reduce((sum: number, e: any) => sum + e.amount, 0);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 md:mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Task Completion</CardTitle>
-          <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+          <TaskForm />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{filteredTaskStats.completionRate.toFixed(0)}%</div>
@@ -71,7 +75,6 @@ const DashboardStats = memo(function DashboardStats({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Productivity Score</CardTitle>
-          <Brain className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{dailyStats?.avgProductivity.toFixed(0)}</div>
@@ -92,7 +95,7 @@ const DashboardStats = memo(function DashboardStats({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Filtered Expenses</CardTitle>
-          <DollarSign className="h-4 w-4 text-muted-foreground" />
+          <ExpenseForm />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
@@ -110,7 +113,7 @@ const DashboardStats = memo(function DashboardStats({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Reading Progress</CardTitle>
-          <Book className="h-4 w-4 text-muted-foreground" />
+          <BookForm />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{readingStats?.totalPages || 0}</div>

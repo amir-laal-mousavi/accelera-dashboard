@@ -18,6 +18,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { WorkoutForm } from "./WorkoutForm";
+import { HabitCreationForm } from "./HabitCreationForm";
 
 interface DashboardChartsProps {
   tasks: any[];
@@ -115,7 +117,13 @@ const DashboardCharts = memo(function DashboardCharts({
     : [];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+    <div className="space-y-6">
+      {/* Add action buttons section */}
+      <div className="flex flex-wrap gap-3 justify-end">
+        <WorkoutForm />
+        <HabitCreationForm />
+      </div>
+
       {/* Task Completion Pie Chart */}
       <Card>
         <CardHeader>
