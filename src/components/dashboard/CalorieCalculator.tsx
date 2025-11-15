@@ -13,25 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Info, Copy } from "lucide-react";
 import { toast } from "sonner";
-
-type WorkoutType = "cardio-steady" | "cardio-hiit" | "strength" | "bodyweight" | "other";
-type Intensity = "light" | "moderate" | "vigorous" | "very-intense" | "heavy";
-
-const MET_VALUES: Record<string, number> = {
-  "cardio-steady-light": 3.5,
-  "cardio-steady-moderate": 7,
-  "cardio-steady-vigorous": 9,
-  "cardio-hiit-very-intense": 12,
-  "strength-light": 3.5,
-  "strength-moderate": 5.5,
-  "strength-heavy": 7,
-  "bodyweight-light": 3,
-  "bodyweight-moderate": 5,
-  "bodyweight-hard": 7,
-  "other-light": 3,
-  "other-moderate": 5,
-  "other-hard": 7,
-};
+import { calculateCaloriesBurned, getIntensityOptions, type WorkoutType, type Intensity } from "@/lib/calorieCalculator";
 
 export function CalorieCalculator() {
   const [open, setOpen] = useState(false);
@@ -82,16 +64,18 @@ export function CalorieCalculator() {
       return;
     }
 
-    // Get MET value based on workout type and intensity
-    const metKey = `${workoutType}-${intensity}`;
-    const met = MET_VALUES[metKey] || 5; // Default to 5 if not found
+    try {
+      const result = calculateCaloriesBurned({
+        weight: parseFloat(weight),
+        duration: parseFloat(duration),
+        workoutType: workoutType as WorkoutType,
+        intensity: intensity as Intensity,
+      });
 
-    // Calculate calories: MET * 3.5 * weight(kg) / 200 * duration(minutes)
-    const weightKg = parseFloat(weight);
-    const durationMin = parseFloat(duration);
-    const calories = Math.round((met * 3.5 * weightKg / 200) * durationMin);
-
-    setCalculatedCalories(calories);
+      setCalculatedCalories(result.calories);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to calculate calories");
+    }
   };
 
   const copyToClipboard = () => {
@@ -119,21 +103,7 @@ export function CalorieCalculator() {
     };
   }, [open]);
 
-  const getIntensityOptions = () => {
-    switch (workoutType) {
-      case "cardio-steady":
-        return ["light", "moderate", "vigorous"];
-      case "cardio-hiit":
-        return ["very-intense"];
-      case "strength":
-        return ["light", "moderate", "heavy"];
-      case "bodyweight":
-      case "other":
-        return ["light", "moderate", "hard"];
-      default:
-        return [];
-    }
-  };
+  const intensityOptions = workoutType ? getIntensityOptions(workoutType as WorkoutType) : [];
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
@@ -251,7 +221,7 @@ export function CalorieCalculator() {
                         <SelectValue placeholder="Select intensity" />
                       </SelectTrigger>
                       <SelectContent>
-                        {getIntensityOptions().map((opt) => (
+                        {intensityOptions.map((opt) => (
                           <SelectItem key={opt} value={opt}>
                             {opt.charAt(0).toUpperCase() + opt.slice(1).replace("-", " ")}
                           </SelectItem>
