@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,11 +30,14 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("name");
 
-  // Get aggregated stats
-  const aggregatedStats = useQuery(api.habits.getAggregatedStats, {
+  // Memoize query args to prevent infinite loops
+  const statsArgs = useMemo(() => ({
     startDate,
     endDate,
-  });
+  }), [startDate, endDate]);
+
+  // Get aggregated stats
+  const aggregatedStats = useQuery(api.habits.getAggregatedStats, statsArgs);
 
   // Filter habits
   let filteredHabits = habits.filter((h) => {
