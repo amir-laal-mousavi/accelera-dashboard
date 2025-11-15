@@ -120,12 +120,12 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
                 <p className="text-xs text-muted-foreground mt-2">Currently tracking</p>
               </CardContent>
             </Card>
-            <Card className="border-2 bg-gradient-to-br from-teal-500/10 to-teal-500/5 hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300">
+            <Card className="border-2 bg-gradient-to-br from-teal-500/10 to-teal-500/5 hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300 dark:from-teal-400/10 dark:to-teal-400/5">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold text-muted-foreground">Best Day</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold bg-gradient-to-br from-teal-500 to-teal-400 bg-clip-text text-transparent">
+                <div className="text-4xl font-bold bg-gradient-to-br from-teal-500 to-teal-400 bg-clip-text text-transparent dark:from-teal-400 dark:to-teal-300">
                   {aggregatedStats.bestDay.count}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
@@ -133,12 +133,12 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
                 </p>
               </CardContent>
             </Card>
-            <Card className="border-2 bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300">
+            <Card className="border-2 bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 dark:from-cyan-400/10 dark:to-cyan-400/5">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-semibold text-muted-foreground">Avg Completion</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold bg-gradient-to-br from-cyan-500 to-cyan-400 bg-clip-text text-transparent">
+                <div className="text-4xl font-bold bg-gradient-to-br from-cyan-500 to-cyan-400 bg-clip-text text-transparent dark:from-cyan-400 dark:to-cyan-300">
                   {Object.keys(aggregatedStats.dailyCompletions).length > 0
                     ? Math.round(
                         Object.values(aggregatedStats.dailyCompletions).reduce((a, b) => a + b, 0) /

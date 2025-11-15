@@ -29,6 +29,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { HabitsSection } from "@/components/dashboard/HabitsSection";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Dashboard() {
   const { isLoading, isAuthenticated, user, signOut } = useAuth();
@@ -219,9 +220,12 @@ export default function Dashboard() {
               <p className="text-sm text-muted-foreground">Welcome back, {user.name || user.email || "User"}</p>
             </div>
           </div>
-          <Button variant="outline" onClick={() => signOut()}>
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button variant="outline" onClick={() => signOut()}>
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 

@@ -79,10 +79,10 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
   const getIntensityColor = (completed: boolean, streakLength: number) => {
     if (!completed) return "bg-muted border-border";
     
-    if (streakLength >= 7) return "bg-cyan-500 border-cyan-600";
-    if (streakLength >= 4) return "bg-teal-500 border-teal-600";
-    if (streakLength >= 2) return "bg-teal-400 border-teal-500";
-    return "bg-teal-300 border-teal-400";
+    if (streakLength >= 7) return "bg-cyan-500 border-cyan-600 dark:bg-cyan-400 dark:border-cyan-500";
+    if (streakLength >= 4) return "bg-teal-500 border-teal-600 dark:bg-teal-400 dark:border-teal-500";
+    if (streakLength >= 2) return "bg-teal-400 border-teal-500 dark:bg-teal-300 dark:border-teal-400";
+    return "bg-teal-300 border-teal-400 dark:bg-teal-200 dark:border-teal-300";
   };
 
   return (
@@ -152,10 +152,10 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
               <span>Less</span>
               <div className="flex gap-1">
                 <div className="w-4 h-4 rounded-md bg-muted border-2" />
-                <div className="w-4 h-4 rounded-md bg-teal-300 border-2" />
-                <div className="w-4 h-4 rounded-md bg-teal-400 border-2" />
-                <div className="w-4 h-4 rounded-md bg-teal-500 border-2" />
-                <div className="w-4 h-4 rounded-md bg-cyan-500 border-2" />
+                <div className="w-4 h-4 rounded-md bg-teal-300 border-2 dark:bg-teal-200" />
+                <div className="w-4 h-4 rounded-md bg-teal-400 border-2 dark:bg-teal-300" />
+                <div className="w-4 h-4 rounded-md bg-teal-500 border-2 dark:bg-teal-400" />
+                <div className="w-4 h-4 rounded-md bg-cyan-500 border-2 dark:bg-cyan-400" />
               </div>
               <span>More</span>
             </div>
