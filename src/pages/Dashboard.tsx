@@ -4,12 +4,13 @@ import { api } from "@/convex/_generated/api";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, TrendingUp, TrendingDown, CheckCircle2, Clock, Target, Book, DollarSign, Activity, Brain, Calendar } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, CheckCircle2, Clock, Target, Book, DollarSign, Activity, Brain, Calendar, Filter } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   AreaChart,
   Area,
@@ -32,6 +33,14 @@ export default function Dashboard() {
   const { isLoading, isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
   const [timeRange, setTimeRange] = useState<"week" | "month" | "year">("month");
+  
+  // Filter states
+  const [taskAreaFilter, setTaskAreaFilter] = useState<string>("all");
+  const [taskStatusFilter, setTaskStatusFilter] = useState<string>("all");
+  const [taskPriorityFilter, setTaskPriorityFilter] = useState<string>("all");
+  const [expenseCategoryFilter, setExpenseCategoryFilter] = useState<string>("all");
+  const [habitFrequencyFilter, setHabitFrequencyFilter] = useState<string>("all");
+  const [bookStatusFilter, setBookStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -98,27 +107,64 @@ export default function Dashboard() {
 
   const isDataLoading = !tasks || !taskStats || !dailyLogs || !habits || !books || !financeStats || !workoutStats;
 
+  // Apply filters
+  const filteredTasks = tasks?.filter((task) => {
+    const dateInRange = task.scheduled && task.scheduled >= startDate.getTime() && task.scheduled <= now.getTime();
+    const areaMatch = taskAreaFilter === "all" || task.area === taskAreaFilter;
+    const statusMatch = taskStatusFilter === "all" || task.status === taskStatusFilter;
+    const priorityMatch = taskPriorityFilter === "all" || task.priority === taskPriorityFilter;
+    return dateInRange && areaMatch && statusMatch && priorityMatch;
+  }) || [];
+
+  const filteredHabits = habits?.filter((habit) => {
+    return habitFrequencyFilter === "all" || habit.frequency === habitFrequencyFilter;
+  }) || [];
+
+  const filteredBooks = books?.filter((book) => {
+    return bookStatusFilter === "all" || book.status === bookStatusFilter;
+  }) || [];
+
+  const filteredExpenses = financeStats?.expenses?.filter((expense) => {
+    return expenseCategoryFilter === "all" || expense.category === expenseCategoryFilter;
+  }) || [];
+
+  // Recalculate stats based on filtered data
+  const filteredTaskStats = {
+    total: filteredTasks.length,
+    completed: filteredTasks.filter((t) => t.done).length,
+    pending: filteredTasks.filter((t) => !t.done).length,
+    completionRate: filteredTasks.length > 0 ? (filteredTasks.filter((t) => t.done).length / filteredTasks.length) * 100 : 0,
+    byArea: filteredTasks.reduce((acc, task) => {
+      acc[task.area] = (acc[task.area] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>),
+    byPriority: filteredTasks.reduce((acc, task) => {
+      acc[task.priority] = (acc[task.priority] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>),
+  };
+
+  const filteredExpenseTotal = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+  const filteredExpensesByCategory = filteredExpenses.reduce((acc, e) => {
+    acc[e.category] = (acc[e.category] || 0) + e.amount;
+    return acc;
+  }, {} as Record<string, number>);
+
   // Prepare chart data
-  const taskCompletionData = taskStats
-    ? [
-        { name: "Completed", value: taskStats.completed, color: "#10b981" },
-        { name: "Pending", value: taskStats.pending, color: "#f59e0b" },
-      ]
-    : [];
+  const taskCompletionData = [
+    { name: "Completed", value: filteredTaskStats.completed, color: "#10b981" },
+    { name: "Pending", value: filteredTaskStats.pending, color: "#f59e0b" },
+  ];
 
-  const tasksByAreaData = taskStats
-    ? Object.entries(taskStats.byArea).map(([area, count]) => ({
-        area,
-        count,
-      }))
-    : [];
+  const tasksByAreaData = Object.entries(filteredTaskStats.byArea).map(([area, count]) => ({
+    area,
+    count,
+  }));
 
-  const tasksByPriorityData = taskStats
-    ? Object.entries(taskStats.byPriority).map(([priority, count]) => ({
-        priority,
-        count,
-      }))
-    : [];
+  const tasksByPriorityData = Object.entries(filteredTaskStats.byPriority).map(([priority, count]) => ({
+    priority,
+    count,
+  }));
 
   const productivityTrendData = dailyLogs
     ? dailyLogs
@@ -130,12 +176,10 @@ export default function Dashboard() {
         }))
     : [];
 
-  const expensesByCategoryData = financeStats
-    ? Object.entries(financeStats.expensesByCategory).map(([category, amount]) => ({
-        category,
-        amount,
-      }))
-    : [];
+  const expensesByCategoryData = Object.entries(filteredExpensesByCategory).map(([category, amount]) => ({
+    category,
+    amount,
+  }));
 
   const workoutTrendData = workoutStats?.workouts
     ? workoutStats.workouts.slice(-10).map((workout) => ({
@@ -153,6 +197,14 @@ export default function Dashboard() {
     : [];
 
   const COLORS = ["#8b5cf6", "#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#ec4899", "#14b8a6"];
+
+  // Get unique categories for filters
+  const expenseCategories = Array.from(new Set(financeStats?.expenses?.map((e) => e.category) || []));
+  const taskAreas = ["Work", "Study", "Programming", "Fitness", "Finance", "Book", "Studying", "Self", "Research", "Startup", "Other"];
+  const taskStatuses = ["Not Started", "In Progress", "Done", "Blocked"];
+  const taskPriorities = ["Critical", "High", "Medium", "Low"];
+  const habitFrequencies = Array.from(new Set(habits?.map((h) => h.frequency) || []));
+  const bookStatuses = Array.from(new Set(books?.map((b) => b.status || "Reading") || []));
 
   return (
     <div className="min-h-screen bg-background">
@@ -176,7 +228,11 @@ export default function Dashboard() {
       <main className="container mx-auto px-4 py-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           {/* Time Range Selector */}
-          <div className="flex justify-end mb-6">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-2">
+              <Filter className="h-5 w-5 text-muted-foreground" />
+              <span className="text-sm font-medium">Filters Active</span>
+            </div>
             <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
               <TabsList>
                 <TabsTrigger value="week">Week</TabsTrigger>
@@ -185,6 +241,140 @@ export default function Dashboard() {
               </TabsList>
             </Tabs>
           </div>
+
+          {/* Filter Controls */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Data Filters</CardTitle>
+              <CardDescription>Filter your dashboard data by various criteria</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Task Filters */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Task Area</label>
+                  <Select value={taskAreaFilter} onValueChange={setTaskAreaFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Areas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Areas</SelectItem>
+                      {taskAreas.map((area) => (
+                        <SelectItem key={area} value={area}>
+                          {area}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Task Status</label>
+                  <Select value={taskStatusFilter} onValueChange={setTaskStatusFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      {taskStatuses.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Task Priority</label>
+                  <Select value={taskPriorityFilter} onValueChange={setTaskPriorityFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Priorities" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Priorities</SelectItem>
+                      {taskPriorities.map((priority) => (
+                        <SelectItem key={priority} value={priority}>
+                          {priority}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Expense Filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Expense Category</label>
+                  <Select value={expenseCategoryFilter} onValueChange={setExpenseCategoryFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {expenseCategories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Habit Filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Habit Frequency</label>
+                  <Select value={habitFrequencyFilter} onValueChange={setHabitFrequencyFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Frequencies" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Frequencies</SelectItem>
+                      {habitFrequencies.map((frequency) => (
+                        <SelectItem key={frequency} value={frequency}>
+                          {frequency}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Book Filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Book Status</label>
+                  <Select value={bookStatusFilter} onValueChange={setBookStatusFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      {bookStatuses.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Reset Filters Button */}
+              <div className="mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setTaskAreaFilter("all");
+                    setTaskStatusFilter("all");
+                    setTaskPriorityFilter("all");
+                    setExpenseCategoryFilter("all");
+                    setHabitFrequencyFilter("all");
+                    setBookStatusFilter("all");
+                  }}
+                >
+                  Reset All Filters
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           {isDataLoading ? (
             <div className="flex items-center justify-center py-20">
@@ -200,11 +390,11 @@ export default function Dashboard() {
                     <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{taskStats?.completionRate.toFixed(0)}%</div>
+                    <div className="text-2xl font-bold">{filteredTaskStats.completionRate.toFixed(0)}%</div>
                     <p className="text-xs text-muted-foreground">
-                      {taskStats?.completed} of {taskStats?.total} tasks
+                      {filteredTaskStats.completed} of {filteredTaskStats.total} tasks
                     </p>
-                    <Progress value={taskStats?.completionRate || 0} className="mt-2" />
+                    <Progress value={filteredTaskStats.completionRate || 0} className="mt-2" />
                   </CardContent>
                 </Card>
 
@@ -231,18 +421,18 @@ export default function Dashboard() {
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Net Balance</CardTitle>
+                    <CardTitle className="text-sm font-medium">Filtered Expenses</CardTitle>
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      ${financeStats?.netBalance.toFixed(2)}
+                      ${filteredExpenseTotal.toFixed(2)}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Income: ${financeStats?.totalIncome.toFixed(2)}
+                      {filteredExpenses.length} expenses
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      Expenses: ${financeStats?.totalExpenses.toFixed(2)}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Net: ${financeStats?.netBalance.toFixed(2)}
                     </p>
                   </CardContent>
                 </Card>
@@ -256,7 +446,7 @@ export default function Dashboard() {
                     <div className="text-2xl font-bold">{readingStats?.totalPages || 0}</div>
                     <p className="text-xs text-muted-foreground">Pages read</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {readingStats?.totalMinutes || 0} minutes
+                      {filteredBooks.length} books
                     </p>
                   </CardContent>
                 </Card>
@@ -268,7 +458,7 @@ export default function Dashboard() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Task Completion</CardTitle>
-                    <CardDescription>Completed vs Pending Tasks</CardDescription>
+                    <CardDescription>Completed vs Pending Tasks (Filtered)</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -297,7 +487,7 @@ export default function Dashboard() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Tasks by Area</CardTitle>
-                    <CardDescription>Distribution across different areas</CardDescription>
+                    <CardDescription>Distribution across different areas (Filtered)</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -337,7 +527,7 @@ export default function Dashboard() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Expenses by Category</CardTitle>
-                    <CardDescription>Spending breakdown</CardDescription>
+                    <CardDescription>Spending breakdown (Filtered)</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -397,12 +587,12 @@ export default function Dashboard() {
               <Card className="mt-6">
                 <CardHeader>
                   <CardTitle>Active Habits</CardTitle>
-                  <CardDescription>Your current habit tracking</CardDescription>
+                  <CardDescription>Your current habit tracking (Filtered: {filteredHabits.length} habits)</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {habits && habits.length > 0 ? (
-                      habits.map((habit) => (
+                    {filteredHabits.length > 0 ? (
+                      filteredHabits.map((habit) => (
                         <div key={habit._id} className="p-4 border rounded-lg">
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-semibold">{habit.name}</h4>
@@ -414,7 +604,7 @@ export default function Dashboard() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-muted-foreground col-span-full text-center py-4">No habits tracked yet</p>
+                      <p className="text-muted-foreground col-span-full text-center py-4">No habits match the current filter</p>
                     )}
                   </div>
                 </CardContent>
@@ -424,12 +614,12 @@ export default function Dashboard() {
               <Card className="mt-6">
                 <CardHeader>
                   <CardTitle>Reading List</CardTitle>
-                  <CardDescription>Your current books</CardDescription>
+                  <CardDescription>Your current books (Filtered: {filteredBooks.length} books)</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {books && books.length > 0 ? (
-                      books.slice(0, 6).map((book) => (
+                    {filteredBooks.length > 0 ? (
+                      filteredBooks.slice(0, 6).map((book) => (
                         <div key={book._id} className="p-4 border rounded-lg">
                           <h4 className="font-semibold mb-1">{book.name}</h4>
                           <p className="text-sm text-muted-foreground mb-2">{book.author}</p>
@@ -440,7 +630,7 @@ export default function Dashboard() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-muted-foreground col-span-full text-center py-4">No books added yet</p>
+                      <p className="text-muted-foreground col-span-full text-center py-4">No books match the current filter</p>
                     )}
                   </div>
                 </CardContent>
