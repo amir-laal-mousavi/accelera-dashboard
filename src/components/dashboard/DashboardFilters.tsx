@@ -51,17 +51,22 @@ const DashboardFilters = memo(function DashboardFilters({
     filters.bookStatusFilter !== "all";
 
   return (
-    <Card className="mb-6 border-2 overflow-hidden">
+    <Card className="mb-6 border-2 overflow-hidden neon-card-hover">
       {/* Compact Header Bar - Always Visible */}
-      <CardHeader className="pb-3 pt-4">
+      <CardHeader className="pb-3 pt-4 bg-gradient-to-r from-card via-card to-accent/5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Filter className="h-5 w-5 text-primary" />
+            <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+              <Filter className="h-4 w-4 text-primary" />
+            </div>
             <div>
-              <CardTitle className="text-lg">Data Filters</CardTitle>
+              <CardTitle className="text-lg font-bold tracking-tight">Data Filters</CardTitle>
               {hasActiveFilters && (
-                <CardDescription className="text-xs mt-0.5">
-                  {Object.values(filters).filter((v: any) => v !== "all").length} active filters
+                <CardDescription className="text-xs mt-0.5 font-medium">
+                  <span className="inline-flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    {Object.values(filters).filter((v: any) => v !== "all").length} active filter{Object.values(filters).filter((v: any) => v !== "all").length !== 1 ? 's' : ''}
+                  </span>
                 </CardDescription>
               )}
             </div>
