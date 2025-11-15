@@ -33,40 +33,88 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
     );
   }
 
-  // Generate date range for the heatmap
-  const days: Array<{ date: Date; timestamp: number; completed: boolean }> = [];
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  
-  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const timestamp = new Date(d).setHours(0, 0, 0, 0);
-    const completion = completions.find((c) => {
-      const cDate = new Date(c.date).setHours(0, 0, 0, 0);
-      return cDate === timestamp;
-    });
+  // Build real calendar structure for the month
+  const calendarData = useMemo(() => {
+    const monthStart = new Date(startDate);
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
     
-    days.push({
-      date: new Date(d),
-      timestamp,
-      completed: completion?.completed || false,
-    });
-  }
-
-  // Group by weeks
-  const weeks: Array<Array<{ date: Date; timestamp: number; completed: boolean }>> = [];
-  let currentWeek: Array<{ date: Date; timestamp: number; completed: boolean }> = [];
-  
-  days.forEach((day, index) => {
-    currentWeek.push(day);
-    if (day.date.getDay() === 6 || index === days.length - 1) {
-      weeks.push([...currentWeek]);
-      currentWeek = [];
+    const monthEnd = new Date(endDate);
+    const year = monthStart.getFullYear();
+    const month = monthStart.getMonth();
+    
+    // Get the last day of the month
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+    
+    // Get the weekday of the 1st (0 = Sunday, 6 = Saturday)
+    const firstWeekday = monthStart.getDay();
+    
+    // Build calendar grid
+    const weeks: Array<Array<{ date: Date; timestamp: number; completed: boolean; inMonth: boolean }>> = [];
+    let currentWeek: Array<{ date: Date; timestamp: number; completed: boolean; inMonth: boolean }> = [];
+    
+    // Fill empty cells before the 1st of the month
+    for (let i = 0; i < firstWeekday; i++) {
+      const emptyDate = new Date(year, month, -(firstWeekday - i - 1));
+      currentWeek.push({
+        date: emptyDate,
+        timestamp: emptyDate.getTime(),
+        completed: false,
+        inMonth: false,
+      });
     }
-  });
+    
+    // Fill actual days of the month
+    for (let day = 1; day <= lastDayOfMonth; day++) {
+      const date = new Date(year, month, day);
+      date.setHours(0, 0, 0, 0);
+      const timestamp = date.getTime();
+      
+      const completion = completions.find((c) => {
+        const cDate = new Date(c.date).setHours(0, 0, 0, 0);
+        return cDate === timestamp;
+      });
+      
+      currentWeek.push({
+        date,
+        timestamp,
+        completed: completion?.completed || false,
+        inMonth: true,
+      });
+      
+      // If Sunday (end of week) or last day of month, push week and start new
+      if (date.getDay() === 6 || day === lastDayOfMonth) {
+        // Fill remaining cells in the last week if needed
+        while (currentWeek.length < 7) {
+          const nextDay = new Date(year, month, day + (currentWeek.length - date.getDay()));
+          currentWeek.push({
+            date: nextDay,
+            timestamp: nextDay.getTime(),
+            completed: false,
+            inMonth: false,
+          });
+        }
+        weeks.push([...currentWeek]);
+        currentWeek = [];
+      }
+    }
+    
+    return weeks;
+  }, [startDate, endDate, completions]);
 
-  const completionRate = completions.filter((c) => c.completed).length / (completions.length || 1) * 100;
+  // Calculate completion rate for days in the month only
+  const completionStats = useMemo(() => {
+    const daysInMonth = calendarData.flat().filter(day => day.inMonth);
+    const completedDays = daysInMonth.filter(day => day.completed).length;
+    const totalDays = daysInMonth.length;
+    const rate = totalDays > 0 ? (completedDays / totalDays) * 100 : 0;
+    
+    return { completedDays, totalDays, rate };
+  }, [calendarData]);
 
-  const handleDayClick = async (day: { date: Date; timestamp: number; completed: boolean }) => {
+  const handleDayClick = async (day: { date: Date; timestamp: number; completed: boolean; inMonth: boolean }) => {
+    if (!day.inMonth) return; // Don't allow toggling days outside the month
+    
     try {
       await toggleCompletion({
         habitId,
@@ -79,77 +127,83 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
     }
   };
 
-  // Calculate intensity for gradient
-  const getIntensityColor = (completed: boolean, streakLength: number) => {
-    if (!completed) return "bg-muted border-border";
+  // Calculate streak for a given day (only counting backwards from that day)
+  const getStreakForDay = (dayTimestamp: number) => {
+    const allDays = calendarData.flat().filter(d => d.inMonth);
+    const dayIndex = allDays.findIndex(d => d.timestamp === dayTimestamp);
     
-    if (streakLength >= 7) return "bg-cyan-500 border-cyan-600 dark:bg-cyan-400 dark:border-cyan-500";
-    if (streakLength >= 4) return "bg-teal-500 border-teal-600 dark:bg-teal-400 dark:border-teal-500";
-    if (streakLength >= 2) return "bg-teal-400 border-teal-500 dark:bg-teal-300 dark:border-teal-400";
-    return "bg-teal-300 border-teal-400 dark:bg-teal-200 dark:border-teal-300";
+    if (dayIndex === -1 || !allDays[dayIndex].completed) return 0;
+    
+    let streak = 0;
+    for (let i = dayIndex; i >= 0; i--) {
+      if (allDays[i].completed) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return streak;
   };
+
+  // Calculate intensity for gradient
+  const getIntensityColor = (completed: boolean, streakLength: number, inMonth: boolean) => {
+    if (!inMonth) return "bg-muted/30 border-muted/50 cursor-not-allowed";
+    if (!completed) return "bg-muted border-border cursor-pointer";
+    
+    if (streakLength >= 7) return "bg-cyan-500 border-cyan-600 dark:bg-cyan-400 dark:border-cyan-500 cursor-pointer";
+    if (streakLength >= 4) return "bg-teal-500 border-teal-600 dark:bg-teal-400 dark:border-teal-500 cursor-pointer";
+    if (streakLength >= 2) return "bg-teal-400 border-teal-500 dark:bg-teal-300 dark:border-teal-400 cursor-pointer";
+    return "bg-teal-300 border-teal-400 dark:bg-teal-200 dark:border-teal-300 cursor-pointer";
+  };
+
+  const monthName = new Date(startDate).toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
   return (
     <Card className="border-2 bg-card/50 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          {habitName} - Streak Heatmap
+          {habitName} - {monthName}
         </CardTitle>
         <CardDescription>
-          Completion rate: {completionRate.toFixed(0)}% ({completions.filter((c) => c.completed).length}/{completions.length} days)
+          Completion rate: {completionStats.rate.toFixed(0)}% ({completionStats.completedDays}/{completionStats.totalDays} days)
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {/* Day labels */}
           <div className="flex gap-1 mb-2">
-            <div className="w-8"></div>
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div key={day} className="w-8 text-xs text-center text-muted-foreground">
+              <div key={day} className="w-10 text-xs text-center font-semibold text-muted-foreground">
                 {day[0]}
               </div>
             ))}
           </div>
 
-          {/* Heatmap grid */}
+          {/* Calendar grid */}
           <div className="space-y-1">
-            {weeks.map((week, weekIndex) => (
+            {calendarData.map((week, weekIndex) => (
               <div key={weekIndex} className="flex gap-1">
-                <div className="w-8 text-xs text-muted-foreground flex items-center">
-                  W{weekIndex + 1}
-                </div>
-                {Array.from({ length: 7 }).map((_, dayIndex) => {
-                  const day = week.find((d) => d.date.getDay() === dayIndex);
+                {week.map((day, dayIndex) => {
+                  const streak = day.inMonth && day.completed ? getStreakForDay(day.timestamp) : 0;
+                  const dateStr = day.date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
                   
-                  if (!day) {
-                    return <div key={dayIndex} className="w-8 h-8" />;
-                  }
-
-                  // Calculate streak: only count consecutive completed days leading up to this day
-                  // Start from this day and go backwards
-                  let streakLength = 0;
-                  if (day.completed) {
-                    const dayIndex = days.findIndex(d => d.timestamp === day.timestamp);
-                    for (let i = dayIndex; i >= 0; i--) {
-                      if (days[i].completed) {
-                        streakLength++;
-                      } else {
-                        break;
-                      }
-                    }
-                  }
-
                   return (
                     <motion.div
-                      key={dayIndex}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={`w-8 h-8 rounded-md border-2 transition-all cursor-pointer ${
-                        getIntensityColor(day.completed, streakLength)
-                      } hover:shadow-lg hover:shadow-primary/20`}
-                      title={`${day.date.toLocaleDateString()}: ${day.completed ? "Completed" : "Not completed"}\nStreak: ${streakLength} days`}
-                      onClick={() => handleDayClick(day)}
-                    />
+                      key={`${weekIndex}-${dayIndex}`}
+                      whileHover={day.inMonth ? { scale: 1.1 } : {}}
+                      whileTap={day.inMonth ? { scale: 0.95 } : {}}
+                      className={`w-10 h-10 rounded-md border-2 transition-all flex items-center justify-center text-xs font-medium ${
+                        getIntensityColor(day.completed, streak, day.inMonth)
+                      } ${day.inMonth ? "hover:shadow-lg hover:shadow-primary/20" : ""}`}
+                      title={day.inMonth ? `${dateStr}: ${day.completed ? "Completed" : "Not completed"}${streak > 0 ? `\nStreak: ${streak} days` : ""}` : ""}
+                      onClick={() => day.inMonth && handleDayClick(day)}
+                    >
+                      {day.inMonth && (
+                        <span className={day.completed ? "text-white font-bold" : "text-muted-foreground"}>
+                          {day.date.getDate()}
+                        </span>
+                      )}
+                    </motion.div>
                   );
                 })}
               </div>
