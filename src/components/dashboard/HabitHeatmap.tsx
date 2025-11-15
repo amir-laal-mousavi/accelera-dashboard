@@ -125,12 +125,18 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
                     return <div key={dayIndex} className="w-8 h-8" />;
                   }
 
-                  // Calculate streak up to this day
-                  const daysSorted = days.filter(d => d.timestamp <= day.timestamp).sort((a, b) => b.timestamp - a.timestamp);
+                  // Calculate streak: only count consecutive completed days leading up to this day
+                  // Start from this day and go backwards
                   let streakLength = 0;
-                  for (const d of daysSorted) {
-                    if (d.completed) streakLength++;
-                    else break;
+                  if (day.completed) {
+                    const dayIndex = days.findIndex(d => d.timestamp === day.timestamp);
+                    for (let i = dayIndex; i >= 0; i--) {
+                      if (days[i].completed) {
+                        streakLength++;
+                      } else {
+                        break;
+                      }
+                    }
                   }
 
                   return (
