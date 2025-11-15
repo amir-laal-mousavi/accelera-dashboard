@@ -29,6 +29,7 @@ interface HabitsSectionProps {
 export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps) {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("name");
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Memoize query args to prevent infinite loops
   const queryArgs = useMemo(() => ({
@@ -36,8 +37,11 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
     endDate,
   }), [startDate, endDate]);
 
-  // Get aggregated stats
-  const aggregatedStats = useQuery(api.habits.getAggregatedStats, queryArgs);
+  // Get aggregated stats - only when needed
+  const aggregatedStats = useQuery(
+    api.habits.getAggregatedStats, 
+    activeTab === "overview" ? queryArgs : "skip"
+  );
 
   // Memoize filtered and sorted habits to prevent infinite loops
   const filteredHabits = useMemo(() => {
@@ -147,7 +151,7 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
           </div>
         )}
 
-        <Tabs defaultValue="overview" className="w-full">
+        <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="heatmaps">Heatmaps</TabsTrigger>
@@ -197,7 +201,7 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
           </TabsContent>
 
           <TabsContent value="heatmaps" className="space-y-6">
-            {filteredHabits.map((habit) => (
+            {activeTab === "heatmaps" && filteredHabits.map((habit) => (
               <HabitHeatmap
                 key={habit._id}
                 habitId={habit._id}
