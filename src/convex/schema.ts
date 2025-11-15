@@ -1,34 +1,28 @@
-import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
-import { Infer, v } from "convex/values";
+import { v } from "convex/values";
+import { authTables } from "@convex-dev/auth/server";
 
-// User roles
-export const ROLES = {
-  ADMIN: "admin",
-  USER: "user",
-  MEMBER: "member",
-} as const;
-
-export const roleValidator = v.union(
-  v.literal(ROLES.ADMIN),
-  v.literal(ROLES.USER),
-  v.literal(ROLES.MEMBER),
+// Validators for enums
+export const moodValidator = v.union(
+  v.literal("Great"),
+  v.literal("Good"),
+  v.literal("Okay"),
+  v.literal("Bad"),
+  v.literal("Terrible")
 );
-export type Role = Infer<typeof roleValidator>;
 
-// Task status and priority
 export const taskStatusValidator = v.union(
   v.literal("Not Started"),
   v.literal("In Progress"),
   v.literal("Done"),
-  v.literal("Blocked"),
+  v.literal("Blocked")
 );
 
 export const taskPriorityValidator = v.union(
   v.literal("Critical"),
   v.literal("High"),
   v.literal("Medium"),
-  v.literal("Low"),
+  v.literal("Low")
 );
 
 export const taskAreaValidator = v.union(
@@ -42,43 +36,25 @@ export const taskAreaValidator = v.union(
   v.literal("Self"),
   v.literal("Research"),
   v.literal("Startup"),
-  v.literal("Other"),
-);
-
-// Mood types
-export const moodValidator = v.union(
-  v.literal("Great"),
-  v.literal("Good"),
-  v.literal("Okay"),
-  v.literal("Bad"),
-  v.literal("Terrible"),
-);
-
-// Subscription tiers
-export const subscriptionTierValidator = v.union(
-  v.literal("free"),
-  v.literal("pro"),
+  v.literal("Other")
 );
 
 const schema = defineSchema(
   {
     ...authTables,
 
+    // Users
     users: defineTable({
       name: v.optional(v.string()),
-      image: v.optional(v.string()),
       email: v.optional(v.string()),
       emailVerificationTime: v.optional(v.number()),
+      phone: v.optional(v.string()),
+      phoneVerificationTime: v.optional(v.number()),
+      image: v.optional(v.string()),
       isAnonymous: v.optional(v.boolean()),
-      role: v.optional(roleValidator),
-      subscriptionTier: v.optional(subscriptionTierValidator),
-      stripeCustomerId: v.optional(v.string()),
-      stripeSubscriptionId: v.optional(v.string()),
-    })
-      .index("email", ["email"])
-      .index("stripeCustomerId", ["stripeCustomerId"]),
+    }).index("email", ["email"]),
 
-    // Tasks table
+    // Tasks
     tasks: defineTable({
       userId: v.id("users"),
       task: v.string(),
@@ -87,15 +63,10 @@ const schema = defineSchema(
       area: taskAreaValidator,
       scheduled: v.optional(v.number()),
       deadline: v.optional(v.number()),
-      timeSpent: v.optional(v.number()), // in minutes
+      timeSpent: v.optional(v.number()),
       done: v.boolean(),
-      dailyLogId: v.optional(v.id("dailyLogs")),
       notes: v.optional(v.string()),
-    })
-      .index("userId", ["userId"])
-      .index("userId_scheduled", ["userId", "scheduled"])
-      .index("userId_done", ["userId", "done"])
-      .index("userId_area", ["userId", "area"]),
+    }).index("userId", ["userId"]),
 
     // Daily logs
     dailyLogs: defineTable({
@@ -110,70 +81,52 @@ const schema = defineSchema(
       .index("userId", ["userId"])
       .index("userId_date", ["userId", "date"]),
 
-    // Water log
+    // Water logs
     waterLogs: defineTable({
       userId: v.id("users"),
-      dailyLogId: v.optional(v.id("dailyLogs")),
       dateTime: v.number(),
-      amount: v.number(), // ml
-      goal: v.optional(v.number()), // ml
-    })
-      .index("userId", ["userId"])
-      .index("userId_dateTime", ["userId", "dateTime"])
-      .index("dailyLogId", ["dailyLogId"]),
+      amount: v.number(),
+      goal: v.optional(v.number()),
+    }).index("userId", ["userId"]),
 
-    // Caffeine log
+    // Caffeine logs
     caffeineLogs: defineTable({
       userId: v.id("users"),
-      dailyLogId: v.optional(v.id("dailyLogs")),
       dateTime: v.number(),
       drink: v.string(),
       type: v.string(),
-      volume: v.number(), // ml
-      caffeine: v.number(), // mg
-    })
-      .index("userId", ["userId"])
-      .index("userId_dateTime", ["userId", "dateTime"])
-      .index("dailyLogId", ["dailyLogId"]),
+      volume: v.number(),
+      caffeine: v.number(),
+    }).index("userId", ["userId"]),
 
-    // Workout log
+    // Workout logs
     workoutLogs: defineTable({
       userId: v.id("users"),
-      dailyLogId: v.optional(v.id("dailyLogs")),
       date: v.number(),
       session: v.string(),
       exercise: v.string(),
       sets: v.optional(v.number()),
       repsPerSet: v.optional(v.number()),
-      weight: v.optional(v.number()), // kg
-      duration: v.optional(v.number()), // minutes
+      weight: v.optional(v.number()),
+      duration: v.optional(v.number()),
       calories: v.optional(v.number()),
       intensity: v.optional(v.string()),
-    })
-      .index("userId", ["userId"])
-      .index("userId_date", ["userId", "date"])
-      .index("dailyLogId", ["dailyLogId"]),
+    }).index("userId", ["userId"]),
 
-    // Sleep log
+    // Sleep logs
     sleepLogs: defineTable({
       userId: v.id("users"),
-      dailyLogId: v.optional(v.id("dailyLogs")),
       date: v.number(),
-      duration: v.number(), // hours
+      duration: v.number(),
       notes: v.optional(v.string()),
-    })
-      .index("userId", ["userId"])
-      .index("userId_date", ["userId", "date"])
-      .index("dailyLogId", ["dailyLogId"]),
+    }).index("userId", ["userId"]),
 
-    // Weight log
+    // Weight logs
     weightLogs: defineTable({
       userId: v.id("users"),
       date: v.number(),
-      weight: v.number(), // kg
-    })
-      .index("userId", ["userId"])
-      .index("userId_date", ["userId", "date"]),
+      weight: v.number(),
+    }).index("userId", ["userId"]),
 
     // Expenses
     expenses: defineTable({
@@ -184,23 +137,7 @@ const schema = defineSchema(
       date: v.number(),
       payment: v.optional(v.string()),
       notes: v.optional(v.string()),
-      budgetId: v.optional(v.id("budgets")),
-    })
-      .index("userId", ["userId"])
-      .index("userId_date", ["userId", "date"])
-      .index("userId_category", ["userId", "category"])
-      .index("budgetId", ["budgetId"]),
-
-    // Budget
-    budgets: defineTable({
-      userId: v.id("users"),
-      budgetItem: v.string(),
-      monthlyBudget: v.number(),
-      category: v.string(),
-      notes: v.optional(v.string()),
-    })
-      .index("userId", ["userId"])
-      .index("userId_category", ["userId", "category"]),
+    }).index("userId", ["userId"]),
 
     // Incomes
     incomes: defineTable({
@@ -210,10 +147,16 @@ const schema = defineSchema(
       category: v.string(),
       date: v.number(),
       notes: v.optional(v.string()),
-    })
-      .index("userId", ["userId"])
-      .index("userId_date", ["userId", "date"])
-      .index("userId_category", ["userId", "category"]),
+    }).index("userId", ["userId"]),
+
+    // Budgets
+    budgets: defineTable({
+      userId: v.id("users"),
+      budgetItem: v.string(),
+      monthlyBudget: v.number(),
+      category: v.string(),
+      notes: v.optional(v.string()),
+    }).index("userId", ["userId"]),
 
     // Books
     books: defineTable({
@@ -225,12 +168,10 @@ const schema = defineSchema(
       startDate: v.optional(v.number()),
       finishDate: v.optional(v.number()),
       status: v.optional(v.string()),
+      rating: v.optional(v.number()),
       cover: v.optional(v.string()),
       notes: v.optional(v.string()),
-      rating: v.optional(v.number()),
-    })
-      .index("userId", ["userId"])
-      .index("userId_status", ["userId", "status"]),
+    }).index("userId", ["userId"]),
 
     // Reading sessions
     readingSessions: defineTable({
@@ -244,30 +185,36 @@ const schema = defineSchema(
       notes: v.optional(v.string()),
     })
       .index("userId", ["userId"])
-      .index("bookId", ["bookId"])
-      .index("userId_date", ["userId", "date"]),
-
-    // Monthly logs
-    monthlyLogs: defineTable({
-      userId: v.id("users"),
-      month: v.string(),
-      start: v.number(),
-      end: v.number(),
-      notes: v.optional(v.string()),
-      goals: v.optional(v.string()),
-    })
-      .index("userId", ["userId"])
-      .index("userId_start", ["userId", "start"]),
+      .index("bookId", ["bookId"]),
 
     // Habits
     habits: defineTable({
       userId: v.id("users"),
       name: v.string(),
       description: v.optional(v.string()),
-      frequency: v.string(), // daily, weekly, etc
+      category: v.optional(v.string()),
+      frequency: v.string(),
       targetDays: v.optional(v.number()),
+      challengeLength: v.optional(v.number()),
+      startDate: v.optional(v.number()),
       color: v.optional(v.string()),
+      isActive: v.optional(v.boolean()),
     }).index("userId", ["userId"]),
+
+    // Habit cycles
+    habitCycles: defineTable({
+      userId: v.id("users"),
+      habitId: v.id("habits"),
+      startDate: v.number(),
+      endDate: v.number(),
+      targetDays: v.number(),
+      completedDays: v.number(),
+      longestStreak: v.number(),
+      completionRate: v.number(),
+      isCompleted: v.boolean(),
+    })
+      .index("userId", ["userId"])
+      .index("habitId", ["habitId"]),
 
     // Habit completions
     habitCompletions: defineTable({
