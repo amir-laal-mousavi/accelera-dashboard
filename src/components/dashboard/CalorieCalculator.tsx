@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,6 +29,7 @@ export function CalorieCalculator() {
   const [avgWeight, setAvgWeight] = useState("");
   const [workoutName, setWorkoutName] = useState("");
   const [calculatedCalories, setCalculatedCalories] = useState<number | null>(null);
+  const firstInputRef = useRef<HTMLInputElement>(null);
 
   const resetForm = () => {
     setWeight("");
@@ -85,7 +86,7 @@ export function CalorieCalculator() {
     }
   };
 
-  // Handle Esc key to close modal
+  // Handle Esc key to close modal and focus management
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && open) {
@@ -96,6 +97,10 @@ export function CalorieCalculator() {
 
     if (open) {
       document.addEventListener("keydown", handleEscape);
+      // Focus first input when modal opens
+      setTimeout(() => {
+        firstInputRef.current?.focus();
+      }, 100);
     }
 
     return () => {
@@ -115,34 +120,42 @@ export function CalorieCalculator() {
           variant="ghost"
           size="icon"
           className="h-8 w-8 rounded-full hover:bg-accent/50"
-          title="Calorie calculator"
+          title="Open calorie calculator"
+          aria-label="Open workout calorie calculator"
         >
-          <Info className="h-4 w-4" />
+          <Info className="h-4 w-4" aria-hidden="true" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent 
+        className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto"
+        aria-describedby="calculator-description"
+      >
         <DialogHeader>
-          <DialogTitle>Workout Calorie Calculator</DialogTitle>
-          <DialogDescription>
-            Quick estimate – does not change your logs.
+          <DialogTitle id="calculator-title">Workout Calorie Calculator</DialogTitle>
+          <DialogDescription id="calculator-description">
+            Quick estimate – does not change your logs. Use Tab to navigate between fields, Enter to calculate, and Escape to close.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* Step 1: Basic Inputs */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold">Basic Information</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <h3 className="text-sm font-semibold" id="basic-info-heading">Basic Information</h3>
+            <div className="grid grid-cols-2 gap-4" role="group" aria-labelledby="basic-info-heading">
               <div className="space-y-2">
                 <Label htmlFor="weight">Body Weight (kg) *</Label>
                 <Input
+                  ref={firstInputRef}
                   id="weight"
                   type="number"
                   placeholder="70"
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
                   required
+                  aria-required="true"
+                  aria-describedby="weight-hint"
                 />
+                <span id="weight-hint" className="sr-only">Enter your body weight in kilograms</span>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="age">Age (optional)</Label>
@@ -152,13 +165,15 @@ export function CalorieCalculator() {
                   placeholder="30"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
+                  aria-describedby="age-hint"
                 />
+                <span id="age-hint" className="sr-only">Optional: Enter your age in years</span>
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="sex">Sex (optional)</Label>
               <Select value={sex} onValueChange={setSex}>
-                <SelectTrigger>
+                <SelectTrigger aria-label="Select sex" aria-describedby="sex-hint">
                   <SelectValue placeholder="Select sex" />
                 </SelectTrigger>
                 <SelectContent>
@@ -167,20 +182,21 @@ export function CalorieCalculator() {
                   <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
                 </SelectContent>
               </Select>
+              <span id="sex-hint" className="sr-only">Optional: Select your biological sex</span>
             </div>
           </div>
 
           {/* Step 2: Workout Type */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold">Workout Details</h3>
-            <div className="space-y-2">
+            <h3 className="text-sm font-semibold" id="workout-details-heading">Workout Details</h3>
+            <div className="space-y-2" role="group" aria-labelledby="workout-details-heading">
               <Label htmlFor="workoutType">Workout Type *</Label>
               <Select value={workoutType} onValueChange={(v) => {
                 setWorkoutType(v as WorkoutType);
                 setIntensity("");
                 setCalculatedCalories(null);
               }}>
-                <SelectTrigger>
+                <SelectTrigger aria-label="Select workout type" aria-required="true" aria-describedby="workout-type-hint">
                   <SelectValue placeholder="Select workout type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -191,6 +207,7 @@ export function CalorieCalculator() {
                   <SelectItem value="other">Other (manual input)</SelectItem>
                 </SelectContent>
               </Select>
+              <span id="workout-type-hint" className="sr-only">Required: Select the type of workout you performed</span>
             </div>
 
             {/* Conditional fields based on workout type */}
@@ -209,7 +226,10 @@ export function CalorieCalculator() {
                         setCalculatedCalories(null);
                       }}
                       required
+                      aria-required="true"
+                      aria-describedby="duration-hint"
                     />
+                    <span id="duration-hint" className="sr-only">Required: Enter workout duration in minutes</span>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="intensity">Intensity *</Label>
@@ -217,7 +237,7 @@ export function CalorieCalculator() {
                       setIntensity(v as Intensity);
                       setCalculatedCalories(null);
                     }}>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="Select intensity level" aria-required="true" aria-describedby="intensity-hint">
                         <SelectValue placeholder="Select intensity" />
                       </SelectTrigger>
                       <SelectContent>
@@ -299,28 +319,41 @@ export function CalorieCalculator() {
           </div>
 
           {/* Calculate Button */}
-          <Button onClick={calculateCalories} className="w-full">
+          <Button 
+            onClick={calculateCalories} 
+            className="w-full"
+            aria-label="Calculate calories burned"
+          >
             Calculate
           </Button>
 
           {/* Result Display */}
           {calculatedCalories !== null && (
-            <div className="space-y-3 p-4 rounded-lg border-2 bg-accent/10 border-accent-teal/30">
+            <div 
+              className="space-y-3 p-4 rounded-lg border-2 bg-accent/10 border-accent-teal/30"
+              role="region"
+              aria-label="Calculation result"
+              aria-live="polite"
+            >
               <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-2">Estimated calories burned:</p>
-                <p className="text-4xl font-bold bg-gradient-to-br from-accent-teal to-accent-cyan bg-clip-text text-transparent">
+                <p className="text-sm text-muted-foreground mb-2" id="result-label">Estimated calories burned:</p>
+                <p 
+                  className="text-4xl font-bold bg-gradient-to-br from-accent-teal to-accent-cyan bg-clip-text text-transparent"
+                  aria-labelledby="result-label"
+                >
                   {calculatedCalories} kcal
                 </p>
               </div>
-              <div className="text-xs text-muted-foreground text-center">
+              <div className="text-xs text-muted-foreground text-center" aria-label="Calculation parameters">
                 Based on: {weight}kg, {duration} minutes, {workoutType.replace("-", " ")} – {intensity} intensity
               </div>
               <Button
                 onClick={copyToClipboard}
                 variant="outline"
                 className="w-full gap-2"
+                aria-label={`Copy ${calculatedCalories} kcal to clipboard`}
               >
-                <Copy className="h-4 w-4" />
+                <Copy className="h-4 w-4" aria-hidden="true" />
                 Copy to Clipboard
               </Button>
             </div>
