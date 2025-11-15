@@ -244,18 +244,41 @@ export default function Dashboard() {
           </div>
 
           {/* Filter Controls */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Data Filters</CardTitle>
-              <CardDescription>Filter your dashboard data by various criteria</CardDescription>
+          <Card className="mb-6 border-2">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl">Data Filters</CardTitle>
+                  <CardDescription className="mt-1">Refine your dashboard data by various criteria</CardDescription>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setTaskAreaFilter("all");
+                    setTaskStatusFilter("all");
+                    setTaskPriorityFilter("all");
+                    setExpenseCategoryFilter("all");
+                    setHabitFrequencyFilter("all");
+                    setBookStatusFilter("all");
+                  }}
+                  className="gap-2"
+                >
+                  <Filter className="h-4 w-4" />
+                  Reset All
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Task Filters */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Task Area</label>
+                <div className="space-y-2 p-4 rounded-lg border bg-card/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="h-4 w-4 text-primary" />
+                    <label className="text-sm font-semibold">Task Area</label>
+                  </div>
                   <Select value={taskAreaFilter} onValueChange={setTaskAreaFilter}>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-2">
                       <SelectValue placeholder="All Areas" />
                     </SelectTrigger>
                     <SelectContent>
@@ -269,10 +292,13 @@ export default function Dashboard() {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Task Status</label>
+                <div className="space-y-2 p-4 rounded-lg border bg-card/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <label className="text-sm font-semibold">Task Status</label>
+                  </div>
                   <Select value={taskStatusFilter} onValueChange={setTaskStatusFilter}>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-2">
                       <SelectValue placeholder="All Statuses" />
                     </SelectTrigger>
                     <SelectContent>
@@ -286,10 +312,13 @@ export default function Dashboard() {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Task Priority</label>
+                <div className="space-y-2 p-4 rounded-lg border bg-card/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                    <label className="text-sm font-semibold">Task Priority</label>
+                  </div>
                   <Select value={taskPriorityFilter} onValueChange={setTaskPriorityFilter}>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-2">
                       <SelectValue placeholder="All Priorities" />
                     </SelectTrigger>
                     <SelectContent>
@@ -304,10 +333,13 @@ export default function Dashboard() {
                 </div>
 
                 {/* Expense Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Expense Category</label>
+                <div className="space-y-2 p-4 rounded-lg border bg-card/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <DollarSign className="h-4 w-4 text-primary" />
+                    <label className="text-sm font-semibold">Expense Category</label>
+                  </div>
                   <Select value={expenseCategoryFilter} onValueChange={setExpenseCategoryFilter}>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-2">
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
@@ -322,10 +354,13 @@ export default function Dashboard() {
                 </div>
 
                 {/* Habit Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Habit Frequency</label>
+                <div className="space-y-2 p-4 rounded-lg border bg-card/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Activity className="h-4 w-4 text-primary" />
+                    <label className="text-sm font-semibold">Habit Frequency</label>
+                  </div>
                   <Select value={habitFrequencyFilter} onValueChange={setHabitFrequencyFilter}>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-2">
                       <SelectValue placeholder="All Frequencies" />
                     </SelectTrigger>
                     <SelectContent>
@@ -340,10 +375,13 @@ export default function Dashboard() {
                 </div>
 
                 {/* Book Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Book Status</label>
+                <div className="space-y-2 p-4 rounded-lg border bg-card/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Book className="h-4 w-4 text-primary" />
+                    <label className="text-sm font-semibold">Book Status</label>
+                  </div>
                   <Select value={bookStatusFilter} onValueChange={setBookStatusFilter}>
-                    <SelectTrigger>
+                    <SelectTrigger className="border-2">
                       <SelectValue placeholder="All Statuses" />
                     </SelectTrigger>
                     <SelectContent>
@@ -356,23 +394,6 @@ export default function Dashboard() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-
-              {/* Reset Filters Button */}
-              <div className="mt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setTaskAreaFilter("all");
-                    setTaskStatusFilter("all");
-                    setTaskPriorityFilter("all");
-                    setExpenseCategoryFilter("all");
-                    setHabitFrequencyFilter("all");
-                    setBookStatusFilter("all");
-                  }}
-                >
-                  Reset All Filters
-                </Button>
               </div>
             </CardContent>
           </Card>
