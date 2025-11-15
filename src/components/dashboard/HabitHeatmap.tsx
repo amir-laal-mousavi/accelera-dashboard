@@ -23,6 +23,7 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
   }), [habitId, startDate, endDate]);
 
   const completions = useQuery(api.habits.getCompletions, completionsArgs);
+  const toggleCompletion = useMutation(api.habits.toggleCompletion);
 
   if (!completions) {
     return (
@@ -63,7 +64,6 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
     }
   });
 
-  const toggleCompletion = useMutation(api.habits.toggleCompletion);
   const completionRate = completions.filter((c) => c.completed).length / (completions.length || 1) * 100;
 
   const handleDayClick = async (day: { date: Date; timestamp: number; completed: boolean }) => {
