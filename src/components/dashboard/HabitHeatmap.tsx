@@ -5,6 +5,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useMemo } from "react";
 
 interface HabitHeatmapProps {
   habitId: Id<"habits">;
@@ -14,11 +15,14 @@ interface HabitHeatmapProps {
 }
 
 export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHeatmapProps) {
-  const completions = useQuery(api.habits.getCompletions, {
+  // Memoize query args to prevent infinite loops
+  const completionsArgs = useMemo(() => ({
     habitId,
     startDate,
     endDate,
-  });
+  }), [habitId, startDate, endDate]);
+
+  const completions = useQuery(api.habits.getCompletions, completionsArgs);
 
   if (!completions) {
     return (
