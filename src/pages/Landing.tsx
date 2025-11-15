@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
 import { useAuth } from "@/hooks/use-auth";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Check, Sparkles } from "lucide-react";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -69,20 +71,106 @@ export default function Landing() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-8">
-              Start Free
+            <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-8 gap-2">
+              <Sparkles className="h-5 w-5" />
+              Start 7-Day Free Trial
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate("/dashboard")} className="text-lg px-8">
               View Demo
             </Button>
           </div>
+          <p className="text-sm text-muted-foreground mt-4">
+            No credit card required • Cancel anytime • Full Pro access
+          </p>
+        </motion.div>
+
+        {/* Pricing Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-20 max-w-4xl"
+        >
+          <Card className="border-2">
+            <CardHeader>
+              <CardTitle>Free</CardTitle>
+              <CardDescription>Get started with basic features</CardDescription>
+              <div className="mt-4">
+                <span className="text-4xl font-bold">$0</span>
+                <span className="text-muted-foreground">/month</span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Basic task tracking</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Up to 3 habits</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Basic analytics</span>
+                </li>
+              </ul>
+              <Button className="w-full mt-6" variant="outline" onClick={() => navigate("/auth")}>
+                Get Started
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 border-primary relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold rounded-bl-lg">
+              POPULAR
+            </div>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Pro
+                <Sparkles className="h-5 w-5 text-primary" />
+              </CardTitle>
+              <CardDescription>Full access to all features</CardDescription>
+              <div className="mt-4">
+                <span className="text-4xl font-bold">$9</span>
+                <span className="text-muted-foreground">/month</span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Unlimited tasks & habits</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Advanced analytics</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Priority support</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Export data</span>
+                </li>
+              </ul>
+              <Button className="w-full mt-6 gap-2" onClick={() => navigate("/auth")}>
+                <Sparkles className="h-4 w-4" />
+                Start 7-Day Free Trial
+              </Button>
+              <p className="text-xs text-center text-muted-foreground mt-2">
+                No credit card required
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
 
         {/* Features Grid */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-20 max-w-6xl"
         >
           {[

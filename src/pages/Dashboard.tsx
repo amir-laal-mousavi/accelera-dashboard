@@ -2,7 +2,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useNavigate } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
+import { TrialBanner } from "@/components/TrialBanner";
 import { motion } from "framer-motion";
 import { Loader2, TrendingUp, TrendingDown, CheckCircle2, Clock, Target, Book, DollarSign, Activity, Brain, Calendar, Filter } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -231,7 +232,8 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <TrialBanner />
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mt-4">
           {/* Time Range Selector */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-2">

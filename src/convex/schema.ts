@@ -56,6 +56,10 @@ const schema = defineSchema(
       plan: v.optional(v.string()),
       lastActiveAt: v.optional(v.number()),
       status: v.optional(v.union(v.literal("active"), v.literal("suspended"), v.literal("banned"))),
+      isOnTrial: v.optional(v.boolean()),
+      trialStartAt: v.optional(v.number()),
+      trialEndAt: v.optional(v.number()),
+      hasUsedTrial: v.optional(v.boolean()),
     })
       .index("email", ["email"])
       .index("role", ["role"])
