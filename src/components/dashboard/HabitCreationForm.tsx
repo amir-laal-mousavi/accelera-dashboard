@@ -104,7 +104,12 @@ export function HabitCreationForm() {
         
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
           {/* Habit Name */}
-          <div className="space-y-2">
+          <motion.div 
+            className="space-y-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.05 }}
+          >
             <Label htmlFor="name" className="text-sm font-semibold">
               Habit Name <span className="text-destructive">*</span>
             </Label>
@@ -116,10 +121,15 @@ export function HabitCreationForm() {
               className="border-2 focus:border-primary transition-colors"
               required
             />
-          </div>
+          </motion.div>
 
           {/* Description */}
-          <div className="space-y-2">
+          <motion.div 
+            className="space-y-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
+          >
             <Label htmlFor="description" className="text-sm font-semibold">
               Description
             </Label>
@@ -131,10 +141,15 @@ export function HabitCreationForm() {
               className="border-2 focus:border-primary transition-colors min-h-20"
               rows={3}
             />
-          </div>
+          </motion.div>
 
           {/* Category and Frequency Row */}
-          <div className="grid grid-cols-2 gap-4">
+          <motion.div 
+            className="grid grid-cols-2 gap-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.15 }}
+          >
             <div className="space-y-2">
               <Label htmlFor="category" className="text-sm font-semibold">
                 Category
@@ -163,10 +178,15 @@ export function HabitCreationForm() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </motion.div>
 
           {/* Challenge Length and Color Row */}
-          <div className="grid grid-cols-2 gap-4">
+          <motion.div 
+            className="grid grid-cols-2 gap-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.2 }}
+          >
             <div className="space-y-2">
               <Label htmlFor="challengeLength" className="text-sm font-semibold">
                 Challenge Length (days)
@@ -214,14 +234,14 @@ export function HabitCreationForm() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </motion.div>
 
           {/* Preview Card */}
           <motion.div 
             className="p-4 rounded-lg border-2 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2, delay: 0.25 }}
           >
             <div className="flex items-center justify-between mb-2">
               <h4 className="font-semibold text-sm text-muted-foreground">Preview</h4>
