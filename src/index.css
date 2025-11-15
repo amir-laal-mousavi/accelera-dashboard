@@ -40,6 +40,11 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* NEW: Secondary & Tertiary Accent Colors */
+  --color-accent-purple: var(--accent-purple);
+  --color-accent-teal: var(--accent-teal);
+  --color-accent-cyan: var(--accent-cyan);
 }
 
 /* CHANGE VALUES FOR THEME */
@@ -76,6 +81,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  
+  /* NEW: Light Theme Accent Colors (Soft Pastels) */
+  --accent-purple: oklch(0.75 0.12 285);
+  --accent-teal: oklch(0.72 0.10 180);
+  --accent-cyan: oklch(0.78 0.08 210);
 }
 
 .dark {
@@ -110,6 +120,11 @@
   --sidebar-accent-foreground: oklch(0.95 0 0);
   --sidebar-border: oklch(1 0 0 / 12%);
   --sidebar-ring: oklch(0.78 0.12 85);
+  
+  /* NEW: Dark Theme Accent Colors (Neon Soft) */
+  --accent-purple: oklch(0.65 0.22 285);
+  --accent-teal: oklch(0.70 0.18 180);
+  --accent-cyan: oklch(0.72 0.16 210);
 }
 
 @layer base {
@@ -157,5 +172,76 @@
   .dark .bg-card\/50 {
     background: oklch(0.12 0 0 / 0.5);
     backdrop-filter: blur(12px);
+  }
+  
+  /* NEW: Accent Color Utilities */
+  .accent-purple {
+    color: var(--accent-purple);
+  }
+  
+  .accent-teal {
+    color: var(--accent-teal);
+  }
+  
+  .accent-cyan {
+    color: var(--accent-cyan);
+  }
+  
+  .bg-accent-purple {
+    background-color: var(--accent-purple);
+  }
+  
+  .bg-accent-teal {
+    background-color: var(--accent-teal);
+  }
+  
+  .bg-accent-cyan {
+    background-color: var(--accent-cyan);
+  }
+  
+  .border-accent-purple {
+    border-color: var(--accent-purple);
+  }
+  
+  .border-accent-teal {
+    border-color: var(--accent-teal);
+  }
+  
+  .border-accent-cyan {
+    border-color: var(--accent-cyan);
+  }
+  
+  /* Active tab glow effect */
+  .tab-active-glow {
+    position: relative;
+  }
+  
+  .tab-active-glow::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-teal), var(--accent-cyan));
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--accent-teal);
+  }
+  
+  /* Subtle gradient backgrounds for charts */
+  .chart-gradient-purple {
+    background: linear-gradient(180deg, transparent 0%, oklch(0.65 0.22 285 / 0.05) 100%);
+  }
+  
+  .chart-gradient-teal {
+    background: linear-gradient(180deg, transparent 0%, oklch(0.70 0.18 180 / 0.05) 100%);
+  }
+  
+  .dark .chart-gradient-purple {
+    background: linear-gradient(180deg, transparent 0%, oklch(0.65 0.22 285 / 0.08) 100%);
+  }
+  
+  .dark .chart-gradient-teal {
+    background: linear-gradient(180deg, transparent 0%, oklch(0.70 0.18 180 / 0.08) 100%);
   }
 }

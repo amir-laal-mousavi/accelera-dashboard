@@ -23,7 +23,7 @@ const DailyView = lazy(() => import("@/components/dashboard/DailyView"));
 export default function Dashboard() {
   const { isLoading, isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [timeRange, setTimeRange] = useState<"daily" | "day" | "week" | "month" | "year">("month");
+  const [timeRange, setTimeRange] = useState<"daily" | "day" | "week" | "month" | "year">("daily");
   
   // Filter states
   const [taskAreaFilter, setTaskAreaFilter] = useState<string>("all");
@@ -169,7 +169,7 @@ export default function Dashboard() {
       <main className="container mx-auto px-4 py-4 md:py-8 pb-20 md:pb-8">
         <TrialBanner />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mt-4">
-          {/* Time Range Selector */}
+          {/* Time Range Selector - Daily is now first and emphasized */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="flex items-center gap-2">
               <Filter className="h-5 w-5 text-muted-foreground" />
@@ -177,8 +177,9 @@ export default function Dashboard() {
             </div>
             <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
               <TabsList>
-                <TabsTrigger value="daily">Daily</TabsTrigger>
-                <TabsTrigger value="day">Day</TabsTrigger>
+                <TabsTrigger value="daily" className={timeRange === "daily" ? "tab-active-glow" : ""}>
+                  Daily
+                </TabsTrigger>
                 <TabsTrigger value="week">Week</TabsTrigger>
                 <TabsTrigger value="month">Month</TabsTrigger>
                 <TabsTrigger value="year">Year</TabsTrigger>

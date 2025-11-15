@@ -128,9 +128,9 @@ const DailyView = memo(function DailyView() {
   // Time distribution pie chart
   const timeDistribution = useMemo(() => {
     const data = [
-      { name: "Work", value: totalWorkoutMinutes, color: "#8b5cf6" },
-      { name: "Reading", value: totalReadingMinutes, color: "#10b981" },
-      { name: "Tasks", value: dailyTasks.length * 30, color: "#3b82f6" }, // Estimate 30 min per task
+      { name: "Work", value: totalWorkoutMinutes, color: "#A67DFF" },
+      { name: "Reading", value: totalReadingMinutes, color: "#2CEAE5" },
+      { name: "Tasks", value: dailyTasks.length * 30, color: "#49D3FF" }, // Estimate 30 min per task
     ].filter((item) => item.value > 0);
     return data;
   }, [totalWorkoutMinutes, totalReadingMinutes, dailyTasks.length]);
@@ -162,7 +162,7 @@ const DailyView = memo(function DailyView() {
   return (
     <div className="space-y-6">
       {/* Date Navigation */}
-      <Card className="border-2">
+      <Card className="border-2 border-accent-teal/20">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -181,7 +181,7 @@ const DailyView = memo(function DailyView() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               {!isToday && (
-                <Button variant="outline" onClick={goToToday}>
+                <Button variant="outline" onClick={goToToday} className="border-accent-teal/30 hover:bg-accent-teal/10">
                   Today
                 </Button>
               )}
@@ -260,7 +260,7 @@ const DailyView = memo(function DailyView() {
                 <XAxis dataKey="area" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#8b5cf6" />
+                <Bar dataKey="count" fill="#6E4AFF" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
