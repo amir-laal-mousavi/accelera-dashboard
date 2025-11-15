@@ -19,11 +19,11 @@ async function requireAdmin(ctx: any) {
 // Helper to check if user is admin or support
 async function requireAdminOrSupport(ctx: any) {
   const userId = await getAuthUserId(ctx);
-  if (!userId) throw new Error("Not authenticated");
+  if (!userId) return null;
   
   const user = await ctx.db.get(userId);
   if (!user || (user.role !== "admin" && user.role !== "support")) {
-    throw new Error("Admin or support access required");
+    return null;
   }
   
   return { userId, user };
@@ -55,7 +55,8 @@ export const logAdminAction = internalMutation({
 export const getAdminStats = query({
   args: {},
   handler: async (ctx) => {
-    await requireAdminOrSupport(ctx);
+    const auth = await requireAdminOrSupport(ctx);
+    if (!auth) return null;
 
     const users = await ctx.db.query("users").collect();
     const now = Date.now();
@@ -90,7 +91,8 @@ export const getAdminStats = query({
 export const getSignupTrend = query({
   args: { days: v.number() },
   handler: async (ctx, args) => {
-    await requireAdminOrSupport(ctx);
+    const auth = await requireAdminOrSupport(ctx);
+    if (!auth) return null;
 
     const users = await ctx.db.query("users").collect();
     const now = Date.now();
@@ -119,7 +121,8 @@ export const listUsers = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await requireAdminOrSupport(ctx);
+    const auth = await requireAdminOrSupport(ctx);
+    if (!auth) return null;
 
     let users;
     
@@ -151,7 +154,8 @@ export const listUsers = query({
 export const getUserDetails = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    await requireAdminOrSupport(ctx);
+    const auth = await requireAdminOrSupport(ctx);
+    if (!auth) return null;
 
     const user = await ctx.db.get(args.userId);
     if (!user) throw new Error("User not found");
@@ -264,7 +268,8 @@ export const suspendUser = mutation({
 export const getCreditStats = query({
   args: {},
   handler: async (ctx) => {
-    await requireAdminOrSupport(ctx);
+    const auth = await requireAdminOrSupport(ctx);
+    if (!auth) return null;
 
     const credits = await ctx.db.query("credits").collect();
     const transactions = await ctx.db.query("creditTransactions").collect();
@@ -285,7 +290,8 @@ export const getCreditStats = query({
 export const getUserCredits = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    await requireAdminOrSupport(ctx);
+    const auth = await requireAdminOrSupport(ctx);
+    if (!auth) return null;
 
     const credits = await ctx.db
       .query("credits")
@@ -372,7 +378,8 @@ export const getActivityLogs = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await requireAdminOrSupport(ctx);
+    const auth = await requireAdminOrSupport(ctx);
+    if (!auth) return null;
 
     let logs;
 
