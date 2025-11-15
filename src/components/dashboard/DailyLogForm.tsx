@@ -113,7 +113,7 @@ export function DailyLogForm({ date, existingLog }: DailyLogFormProps) {
                 <SelectValue placeholder="Select mood" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Excellent">😄 Excellent</SelectItem>
+                <SelectItem value="Great">😄 Great</SelectItem>
                 <SelectItem value="Good">🙂 Good</SelectItem>
                 <SelectItem value="Okay">😐 Okay</SelectItem>
                 <SelectItem value="Bad">😞 Bad</SelectItem>
