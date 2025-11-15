@@ -8,45 +8,36 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { Home, LayoutDashboard, LogOut, Menu, Shield, User } from "lucide-react";
+import { Home, LayoutDashboard, LogOut, Menu, Shield, User, Settings } from "lucide-react";
+import { useMobile } from "@/hooks/use-mobile";
 
 export function LogoDropdown() {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { signOut } = useAuth();
+  const isMobile = useMobile();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="h-5 w-5" />
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <img src="./logo.svg" alt="Menu" className="h-6 w-6" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuItem onClick={() => navigate("/")}>
-          <Home className="mr-2 h-4 w-4" />
-          Home
-        </DropdownMenuItem>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/dashboard")}>
           <LayoutDashboard className="mr-2 h-4 w-4" />
           Dashboard
         </DropdownMenuItem>
-        {isAdmin && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/admin")}>
-              <Shield className="mr-2 h-4 w-4" />
-              Admin Dashboard
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/admin/users")}>
-              <User className="mr-2 h-4 w-4" />
-              User Management
-            </DropdownMenuItem>
-          </>
-        )}
+        <DropdownMenuItem onClick={() => navigate("/settings")}>
+          <Settings className="mr-2 h-4 w-4" />
+          Settings
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut()}>
+        <DropdownMenuItem onClick={() => signOut()} className="text-destructive">
           <LogOut className="mr-2 h-4 w-4" />
           Sign Out
         </DropdownMenuItem>
