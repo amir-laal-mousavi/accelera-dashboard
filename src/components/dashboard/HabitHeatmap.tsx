@@ -127,7 +127,6 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
       
       // Fill actual days of the month
       let completedCount = 0;
-      let validDaysCount = 0;
       
       for (let day = 1; day <= lastDayOfMonth; day++) {
         const date = new Date(year, month, day);
@@ -148,12 +147,9 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
           isFuture,
         });
         
-        // Count only non-future days for stats
-        if (!isFuture) {
-          validDaysCount++;
-          if (completion?.completed) {
-            completedCount++;
-          }
+        // Count all completed days in the month (including future if somehow marked)
+        if (completion?.completed) {
+          completedCount++;
         }
         
         if (date.getDay() === 6 || day === lastDayOfMonth) {
@@ -172,8 +168,10 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
         }
       }
       
-      const rate = validDaysCount > 0 ? (completedCount / validDaysCount) * 100 : 0;
-      return { weeks, stats: { completedDays: completedCount, totalDays: validDaysCount, rate } };
+      // FIXED: Always use full month days as denominator
+      const totalDaysInMonth = lastDayOfMonth;
+      const rate = totalDaysInMonth > 0 ? (completedCount / totalDaysInMonth) * 100 : 0;
+      return { weeks, stats: { completedDays: completedCount, totalDays: totalDaysInMonth, rate } };
     } else {
       // Yearly: 12 months
       const months = [];
@@ -184,48 +182,45 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
         const monthDate = new Date(selectedYear, m, 1);
         const isFuture = selectedYear > currentYear || (selectedYear === currentYear && m > currentMonth);
         
+        // Get the actual number of days in this month
+        const daysInThisMonth = new Date(selectedYear, m + 1, 0).getDate();
+        
         if (isFuture) {
           months.push({
             month: m,
             monthName: monthDate.toLocaleDateString("en-US", { month: "short" }),
             completed: 0,
-            total: 0,
+            total: daysInThisMonth,
             rate: 0,
             isFuture: true,
           });
         } else {
-          const monthStart = new Date(selectedYear, m, 1);
-          monthStart.setHours(0, 0, 0, 0);
-          const monthEnd = new Date(selectedYear, m + 1, 0);
-          monthEnd.setHours(23, 59, 59, 999);
-          
-          const lastDayOfMonth = monthEnd.getDate();
-          const isCurrentMonth = selectedYear === currentYear && m === currentMonth;
-          const validDays = isCurrentMonth ? now.getDate() : lastDayOfMonth;
-          
           const monthCompletions = completions.filter((c) => {
             const cDate = new Date(c.date);
             return cDate.getFullYear() === selectedYear && cDate.getMonth() === m && c.completed;
           });
           
-          const rate = validDays > 0 ? (monthCompletions.length / validDays) * 100 : 0;
+          // FIXED: Always use full month days as denominator
+          const rate = daysInThisMonth > 0 ? (monthCompletions.length / daysInThisMonth) * 100 : 0;
           
           months.push({
             month: m,
             monthName: monthDate.toLocaleDateString("en-US", { month: "short" }),
             completed: monthCompletions.length,
-            total: validDays,
+            total: daysInThisMonth,
             rate,
             isFuture: false,
           });
         }
       }
       
+      // FIXED: Use full year days (365 or 366) as denominator
       const totalCompleted = months.reduce((sum, m) => sum + m.completed, 0);
-      const totalDays = months.reduce((sum, m) => sum + m.total, 0);
-      const overallRate = totalDays > 0 ? (totalCompleted / totalDays) * 100 : 0;
+      const isLeapYear = (selectedYear % 4 === 0 && selectedYear % 100 !== 0) || (selectedYear % 400 === 0);
+      const daysInYear = isLeapYear ? 366 : 365;
+      const overallRate = daysInYear > 0 ? (totalCompleted / daysInYear) * 100 : 0;
       
-      return { months, stats: { completedDays: totalCompleted, totalDays, rate: overallRate } };
+      return { months, stats: { completedDays: totalCompleted, totalDays: daysInYear, rate: overallRate } };
     }
   }, [completions, viewMode, selectedMonth, selectedYear]);
 
