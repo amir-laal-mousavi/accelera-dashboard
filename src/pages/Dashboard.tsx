@@ -94,6 +94,14 @@ export default function Dashboard() {
     endDate: endDateTime,
   });
 
+  // Memoize filtered habits to prevent infinite loops
+  const filteredHabits = useMemo(() => {
+    if (!habits) return [];
+    return habits.filter((habit) => {
+      return habitFrequencyFilter === "all" || habit.frequency === habitFrequencyFilter;
+    });
+  }, [habits, habitFrequencyFilter]);
+
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -216,9 +224,7 @@ export default function Dashboard() {
 
               <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
                 <HabitsSection 
-                  habits={(habits || []).filter((habit) => {
-                    return filters.habitFrequencyFilter === "all" || habit.frequency === filters.habitFrequencyFilter;
-                  })} 
+                  habits={filteredHabits} 
                   startDate={startDateTime} 
                   endDate={endDateTime} 
                 />
