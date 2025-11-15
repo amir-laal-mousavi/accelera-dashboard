@@ -184,12 +184,9 @@ export default function Dashboard() {
               <Filter className="h-5 w-5 text-muted-foreground" />
               <span className="text-sm font-medium">View Mode</span>
             </div>
-            <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)} className="neon-tabs">
+            <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
               <TabsList className="bg-card/50 backdrop-blur-sm border border-border/50">
-                <TabsTrigger 
-                  value="daily" 
-                  className={timeRange === "daily" ? "neon-tab-active" : "hover:bg-accent/30 transition-all"}
-                >
+                <TabsTrigger value="daily" className="hover:bg-accent/30 transition-all">
                   Daily
                 </TabsTrigger>
                 <TabsTrigger value="week" className="hover:bg-accent/30 transition-all">Week</TabsTrigger>
