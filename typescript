@@ -1,0 +1,9 @@
+// REMOVED THIS - it was causing infinite loops:
+const habitStats = habits.map((habit) => {
+  const stats = useQuery(api.habits.getHabitStats, {
+    habitId: habit._id,
+    startDate,
+    endDate,
+  });
+  return { habitId: habit._id, stats };
+});

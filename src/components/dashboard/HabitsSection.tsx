@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HabitHeatmap } from "./HabitHeatmap";
 import { HabitFilters } from "./HabitFilters";
 import { Id } from "@/convex/_generated/dataModel";
-import { Progress } from "@/components/ui/progress";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
@@ -37,23 +36,13 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
     endDate,
   });
 
-  // Get stats for each habit for sorting
-  const habitStats = habits.map((habit) => {
-    const stats = useQuery(api.habits.getHabitStats, {
-      habitId: habit._id,
-      startDate,
-      endDate,
-    });
-    return { habitId: habit._id, stats };
-  });
-
-  // Filter and sort habits
+  // Filter habits
   let filteredHabits = habits.filter((h) => {
     if (categoryFilter === "all") return true;
     return h.category === categoryFilter;
   });
 
-  // Sort habits
+  // Sort habits - simplified without individual stats
   filteredHabits = [...filteredHabits].sort((a, b) => {
     switch (sortBy) {
       case "name":
@@ -64,22 +53,18 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
         return (b.startDate || 0) - (a.startDate || 0);
       case "date-old":
         return (a.startDate || 0) - (b.startDate || 0);
-      case "streak": {
-        const aStats = habitStats.find(h => h.habitId === a._id)?.stats;
-        const bStats = habitStats.find(h => h.habitId === b._id)?.stats;
-        return (bStats?.longestStreak || 0) - (aStats?.longestStreak || 0);
-      }
-      case "completion": {
-        const aStats = habitStats.find(h => h.habitId === a._id)?.stats;
-        const bStats = habitStats.find(h => h.habitId === b._id)?.stats;
-        return (bStats?.completionRate || 0) - (aStats?.completionRate || 0);
-      }
+      case "streak":
+      case "completion":
+        // For now, sort by name when stats-based sorting is selected
+        // Individual stats queries were causing infinite loops
+        return a.name.localeCompare(b.name);
       default:
         return 0;
     }
   });
 
   const categories = Array.from(new Set(habits.map((h) => h.category).filter(Boolean))) as string[];
+  
   if (filteredHabits.length === 0) {
     return (
       <Card>
