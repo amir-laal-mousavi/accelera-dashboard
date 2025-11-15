@@ -125,3 +125,61 @@ export function watchOnlineStatus(callback: (isOnline: boolean) => void) {
     window.removeEventListener("offline", handleOffline);
   };
 }
+
+export async function syncTaskEdit(taskId: string, updates: any) {
+  if (isOnline()) {
+    return updates;
+  }
+  
+  await queueOperation("update", "tasks", { id: taskId, ...updates });
+  await cacheData("tasks", taskId, updates);
+  return updates;
+}
+
+export async function syncTaskCreate(task: any) {
+  if (isOnline()) {
+    return task;
+  }
+  
+  const tempId = `temp_${Date.now()}`;
+  await queueOperation("create", "tasks", { ...task, tempId });
+  await cacheData("tasks", tempId, task);
+  return { ...task, _id: tempId };
+}
+
+export async function syncTaskDelete(taskId: string) {
+  if (isOnline()) {
+    return true;
+  }
+  
+  await queueOperation("delete", "tasks", { id: taskId });
+  return true;
+}
+
+export async function processPendingTaskOperations(
+  convexMutation: (name: string, args: any) => Promise<any>
+) {
+  const operations = await getPendingOperations();
+  
+  for (const op of operations) {
+    if (op.entity !== "tasks") continue;
+    
+    try {
+      switch (op.type) {
+        case "create":
+          await convexMutation("tasks:create", op.payload);
+          break;
+        case "update":
+          await convexMutation("tasks:update", op.payload);
+          break;
+        case "delete":
+          await convexMutation("tasks:remove", { id: op.payload.id });
+          break;
+      }
+      
+      await clearPendingOperation(op.id);
+    } catch (error) {
+      console.error("Failed to sync operation:", error);
+    }
+  }
+}
