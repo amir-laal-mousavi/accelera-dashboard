@@ -112,7 +112,10 @@ const DailyView = memo(function DailyView() {
   const totalTasks = dailyTasks.length;
   const taskCompletionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
-  const totalWater = waterLogs?.reduce((sum, log) => sum + log.amount, 0) || 0;
+  const totalWater = useMemo(() => {
+    if (!waterLogs || waterLogs.length === 0) return 0;
+    return waterLogs.reduce((sum, log) => sum + log.amount, 0);
+  }, [waterLogs]);
   const totalWorkoutMinutes = workouts?.reduce((sum, w) => sum + (w.duration || 0), 0) || 0;
   const totalReadingMinutes = readingSessions?.reduce((sum, s) => sum + s.minutes, 0) || 0;
 
@@ -214,7 +217,7 @@ const DailyView = memo(function DailyView() {
           <CardContent>
             <div className="text-2xl font-bold">{totalWater}ml</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Goal: {waterLogs?.[0]?.goal || 2000}ml
+              Goal: {waterLogs && waterLogs.length > 0 ? (waterLogs[0]?.goal || 2000) : 2000}ml
             </p>
           </CardContent>
         </Card>
