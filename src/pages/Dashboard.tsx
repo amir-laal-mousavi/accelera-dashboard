@@ -23,7 +23,7 @@ const DailyView = lazy(() => import("@/components/dashboard/DailyView"));
 export default function Dashboard() {
   const { isLoading, isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [timeRange, setTimeRange] = useState<"daily" | "day" | "week" | "month" | "year">("daily");
+  const [timeRange, setTimeRange] = useState<"daily" | "week" | "month" | "year">("daily");
   
   // Filter states
   const [taskAreaFilter, setTaskAreaFilter] = useState<string>("all");
@@ -43,7 +43,7 @@ export default function Dashboard() {
   const { startDate: startDateTime, endDateTime } = useMemo(() => {
     const now = new Date();
     const startDate = new Date(now);
-    if (timeRange === "daily" || timeRange === "day") {
+    if (timeRange === "daily") {
       startDate.setHours(0, 0, 0, 0);
     } else if (timeRange === "week") {
       startDate.setDate(now.getDate() - 7);
