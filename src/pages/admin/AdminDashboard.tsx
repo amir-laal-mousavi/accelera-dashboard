@@ -1,19 +1,60 @@
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Users, Activity, DollarSign, TrendingUp, Shield } from "lucide-react";
+import { Loader2, Users, Activity, DollarSign, TrendingUp, Shield, AlertCircle } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router";
+import { useEffect } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const stats = useQuery(api.admin.getAdminStats);
   const signupTrend = useQuery(api.admin.getSignupTrend, { days: 30 });
   const creditStats = useQuery(api.admin.getCreditStats);
 
-  if (!stats || !signupTrend || !creditStats) {
+  // Check for authorization errors
+  useEffect(() => {
+    if (stats === undefined || signupTrend === undefined || creditStats === undefined) {
+      return; // Still loading
+    }
+  }, [stats, signupTrend, creditStats]);
+
+  // Handle loading state
+  if (stats === undefined || signupTrend === undefined || creditStats === undefined) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  // Handle error state (null means error occurred)
+  if (stats === null || signupTrend === null || creditStats === null) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <Card className="max-w-md w-full">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-6 w-6 text-destructive" />
+              <CardTitle>Access Denied</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Admin Access Required</AlertTitle>
+              <AlertDescription>
+                You don't have permission to access the admin dashboard. This area is restricted to administrators and support staff only.
+              </AlertDescription>
+            </Alert>
+            <Button onClick={() => navigate("/dashboard")} className="w-full">
+              Return to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
