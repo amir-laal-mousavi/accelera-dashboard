@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from "lucide-react";
+import { Plus, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { Id } from "@/convex/_generated/dataModel";
 
@@ -34,14 +34,36 @@ interface TaskFormProps {
 
 export function TaskForm({ task }: TaskFormProps) {
   const [open, setOpen] = useState(false);
-  const [taskName, setTaskName] = useState(task?.task || "");
-  const [status, setStatus] = useState(task?.status || "To Do");
-  const [priority, setPriority] = useState(task?.priority || "Medium");
-  const [area, setArea] = useState(task?.area || "Personal");
-  const [scheduled, setScheduled] = useState(task?.scheduled ? new Date(task.scheduled).toISOString().split('T')[0] : "");
-  const [deadline, setDeadline] = useState(task?.deadline ? new Date(task.deadline).toISOString().split('T')[0] : "");
-  const [notes, setNotes] = useState(task?.notes || "");
+  const [taskName, setTaskName] = useState("");
+  const [status, setStatus] = useState("To Do");
+  const [priority, setPriority] = useState("Medium");
+  const [area, setArea] = useState("Personal");
+  const [scheduled, setScheduled] = useState("");
+  const [deadline, setDeadline] = useState("");
+  const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Update form when task prop changes or dialog opens
+  useEffect(() => {
+    if (task && open) {
+      setTaskName(task.task);
+      setStatus(task.status);
+      setPriority(task.priority);
+      setArea(task.area);
+      setScheduled(task.scheduled ? new Date(task.scheduled).toISOString().split('T')[0] : "");
+      setDeadline(task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : "");
+      setNotes(task.notes || "");
+    } else if (!task && open) {
+      // Reset for new task
+      setTaskName("");
+      setStatus("To Do");
+      setPriority("Medium");
+      setArea("Personal");
+      setScheduled("");
+      setDeadline("");
+      setNotes("");
+    }
+  }, [task, open]);
 
   const createTask = useMutation(api.tasks.create);
   const updateTask = useMutation(api.tasks.update);
@@ -102,10 +124,16 @@ export function TaskForm({ task }: TaskFormProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="gap-2">
-          <Plus className="h-4 w-4" />
-          {task ? "Edit Task" : "Add Task"}
-        </Button>
+        {task ? (
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Edit className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button size="sm" className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Task
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
