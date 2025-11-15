@@ -21,7 +21,7 @@ export default function Landing() {
       <header className="border-b bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="./logo.svg" alt="Logo" className="h-10 w-10" />
+            <img src="./logo.svg" alt="Logo" className="h-10 w-10" loading="eager" />
             <h1 className="text-xl font-bold tracking-tight">ACCELERA</h1>
           </div>
           <div className="flex items-center gap-4">
@@ -57,6 +57,7 @@ export default function Landing() {
               width={120}
               height={120}
               className="rounded-2xl"
+              loading="eager"
             />
           </div>
           

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'accelera-v1';
+const CACHE_NAME = 'accelera-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -70,3 +70,56 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// Push notification event
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'ACCELERA Planner';
+  const options = {
+    body: data.body || 'You have a new notification',
+    icon: '/logo.png',
+    badge: '/logo.png',
+    data: data.url || '/',
+    tag: data.tag || 'default',
+    requireInteraction: false,
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  const urlToOpen = event.notification.data || '/';
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Check if there's already a window open
+      for (const client of clientList) {
+        if (client.url === urlToOpen && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Open new window if none found
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
+  );
+});
+
+// Background sync event
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-operations') {
+    event.waitUntil(syncPendingOperations());
+  }
+});
+
+async function syncPendingOperations() {
+  // This would sync with your backend
+  // Implementation depends on your backend API
+  console.log('Syncing pending operations...');
+}

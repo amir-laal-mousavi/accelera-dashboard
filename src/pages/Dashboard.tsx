@@ -4,6 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { useNavigate } from "react-router";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { TrialBanner } from "@/components/TrialBanner";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { motion } from "framer-motion";
 import { Loader2, TrendingUp, TrendingDown, CheckCircle2, Clock, Target, Book, DollarSign, Activity, Brain, Calendar, Filter } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -213,11 +214,12 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <OfflineIndicator />
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-4">
-            <img src="./logo.svg" alt="Logo" className="h-8 w-8 md:h-10 md:w-10 cursor-pointer" onClick={() => navigate("/")} />
+            <img src="./logo.svg" alt="Logo" className="h-8 w-8 md:h-10 md:w-10 cursor-pointer" onClick={() => navigate("/")} loading="eager" />
             <div className="hidden sm:block">
               <h1 className="text-lg md:text-2xl font-bold tracking-tight">ACCELERA Dashboard</h1>
               <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Welcome back, {user.name || user.email || "User"}</p>
