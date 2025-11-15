@@ -217,3 +217,5 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
     </Card>
   );
 }
+
+export default HabitsSection;
