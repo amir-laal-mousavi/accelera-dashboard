@@ -15,6 +15,8 @@ interface HabitHeatmapProps {
 }
 
 export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHeatmapProps) {
+  const toggleCompletion = useMutation(api.habits.toggleCompletion);
+
   // Memoize query args to prevent infinite loops
   const completionsArgs = useMemo(() => ({
     habitId,
@@ -23,23 +25,15 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
   }), [habitId, startDate, endDate]);
 
   const completions = useQuery(api.habits.getCompletions, completionsArgs);
-  const toggleCompletion = useMutation(api.habits.toggleCompletion);
-
-  if (!completions) {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
-    );
-  }
 
   // Build real calendar structure for the month
   const calendarData = useMemo(() => {
+    if (!completions) return [];
+    
     const monthStart = new Date(startDate);
     monthStart.setDate(1);
     monthStart.setHours(0, 0, 0, 0);
     
-    const monthEnd = new Date(endDate);
     const year = monthStart.getFullYear();
     const month = monthStart.getMonth();
     
@@ -112,21 +106,6 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
     return { completedDays, totalDays, rate };
   }, [calendarData]);
 
-  const handleDayClick = async (day: { date: Date; timestamp: number; completed: boolean; inMonth: boolean }) => {
-    if (!day.inMonth) return; // Don't allow toggling days outside the month
-    
-    try {
-      await toggleCompletion({
-        habitId,
-        date: day.timestamp,
-        completed: !day.completed,
-      });
-      toast.success(day.completed ? "Marked as incomplete" : "Marked as complete!");
-    } catch (error) {
-      toast.error("Failed to update habit");
-    }
-  };
-
   // Calculate streak for a given day (only counting backwards from that day)
   const getStreakForDay = (dayTimestamp: number) => {
     const allDays = calendarData.flat().filter(d => d.inMonth);
@@ -155,6 +134,29 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
     if (streakLength >= 2) return "bg-teal-400 border-teal-500 dark:bg-teal-300 dark:border-teal-400 cursor-pointer";
     return "bg-teal-300 border-teal-400 dark:bg-teal-200 dark:border-teal-300 cursor-pointer";
   };
+
+  const handleDayClick = async (day: { date: Date; timestamp: number; completed: boolean; inMonth: boolean }) => {
+    if (!day.inMonth) return; // Don't allow toggling days outside the month
+    
+    try {
+      await toggleCompletion({
+        habitId,
+        date: day.timestamp,
+        completed: !day.completed,
+      });
+      toast.success(day.completed ? "Marked as incomplete" : "Marked as complete!");
+    } catch (error) {
+      toast.error("Failed to update habit");
+    }
+  };
+
+  if (!completions) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
 
   const monthName = new Date(startDate).toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
