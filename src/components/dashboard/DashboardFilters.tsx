@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useState, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,6 +22,17 @@ const DashboardFilters = memo(function DashboardFilters({
   books,
 }: DashboardFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleResetFilters = useCallback(() => {
+    setIsResetting(true);
+    resetFilters();
+    
+    // Reset animation state after animation completes
+    setTimeout(() => {
+      setIsResetting(false);
+    }, 600);
+  }, [resetFilters]);
 
   const expenseCategories = Array.from(new Set(financeStats?.expenses?.map((e: any) => e.category) || []));
   const taskAreas = ["Work", "Study", "Programming", "Fitness", "Finance", "Book", "Studying", "Self", "Research", "Startup", "Other"];
@@ -57,14 +68,22 @@ const DashboardFilters = memo(function DashboardFilters({
           </div>
           <div className="flex items-center gap-2">
             {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={resetFilters}
-                className="text-xs gap-1.5 h-8"
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
               >
-                Reset All
-              </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleResetFilters}
+                  className="text-xs gap-1.5 h-8"
+                  disabled={isResetting}
+                >
+                  {isResetting ? "Resetting..." : "Reset All"}
+                </Button>
+              </motion.div>
             )}
             <Button
               variant="outline"
@@ -91,12 +110,23 @@ const DashboardFilters = memo(function DashboardFilters({
         {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
+            animate={{ 
+              height: "auto", 
+              opacity: 1,
+              scale: isResetting ? 0.98 : 1
+            }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
             <CardContent className="pt-0 pb-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <motion.div 
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+                animate={isResetting ? {
+                  opacity: [1, 0.5, 1],
+                  scale: [1, 0.98, 1]
+                } : {}}
+                transition={{ duration: 0.6, ease: "easeInOut" }}
+              >
                 {/* Task Area Filter */}
                 <div className="space-y-1.5 p-3 rounded-lg border bg-card/50">
                   <div className="flex items-center gap-2 mb-2">
@@ -222,7 +252,7 @@ const DashboardFilters = memo(function DashboardFilters({
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
+              </motion.div>
             </CardContent>
           </motion.div>
         )}
