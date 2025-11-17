@@ -77,8 +77,8 @@ const DashboardCharts = memo(function DashboardCharts({
 
   // Prepare chart data
   const taskCompletionData = [
-    { name: "Completed", value: filteredTaskStats.completed, color: "#10b981" },
-    { name: "Pending", value: filteredTaskStats.pending, color: "#f59e0b" },
+    { name: "Completed", value: filteredTaskStats.completed, color: "#2CEAE5" },
+    { name: "Pending", value: filteredTaskStats.pending, color: "#A67DFF" },
   ];
 
   const tasksByAreaData = Object.entries(filteredTaskStats.byArea).map(([area, count]) => ({
@@ -88,6 +88,7 @@ const DashboardCharts = memo(function DashboardCharts({
 
   const productivityTrendData = dailyLogs
     ? dailyLogs
+        .sort((a, b) => a.date - b.date)
         .slice(-14)
         .map((log) => ({
           date: new Date(log.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
@@ -102,18 +103,24 @@ const DashboardCharts = memo(function DashboardCharts({
   }));
 
   const workoutTrendData = workoutStats?.workouts
-    ? workoutStats.workouts.slice(-10).map((workout: any) => ({
-        date: new Date(workout.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-        duration: workout.duration || 0,
-        calories: workout.calories || 0,
-      }))
+    ? workoutStats.workouts
+        .sort((a: any, b: any) => a.date - b.date)
+        .slice(-10)
+        .map((workout: any) => ({
+          date: new Date(workout.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          duration: workout.duration || 0,
+          calories: workout.calories || 0,
+        }))
     : [];
 
   const sleepTrendData = sleepLogs
-    ? sleepLogs.slice(-14).map((log) => ({
-        date: new Date(log.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-        hours: log.duration,
-      }))
+    ? sleepLogs
+        .sort((a, b) => a.date - b.date)
+        .slice(-14)
+        .map((log) => ({
+          date: new Date(log.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          hours: log.duration,
+        }))
     : [];
 
   return (
@@ -166,7 +173,7 @@ const DashboardCharts = memo(function DashboardCharts({
               <XAxis dataKey="area" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="count" fill="#8b5cf6" />
+              <Bar dataKey="count" fill="#6E4AFF" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -186,8 +193,8 @@ const DashboardCharts = memo(function DashboardCharts({
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="productivity" stroke="#8b5cf6" strokeWidth={2} />
-              <Line type="monotone" dataKey="health" stroke="#10b981" strokeWidth={2} />
+              <Line type="monotone" dataKey="productivity" stroke="#A67DFF" strokeWidth={2} />
+              <Line type="monotone" dataKey="health" stroke="#2CEAE5" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -206,7 +213,7 @@ const DashboardCharts = memo(function DashboardCharts({
               <XAxis type="number" />
               <YAxis dataKey="category" type="category" width={100} />
               <Tooltip />
-              <Bar dataKey="amount" fill="#3b82f6" />
+              <Bar dataKey="amount" fill="#49D3FF" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -226,8 +233,8 @@ const DashboardCharts = memo(function DashboardCharts({
               <YAxis />
               <Tooltip />
               <Legend />
-              <Area type="monotone" dataKey="duration" stackId="1" stroke="#f59e0b" fill="#f59e0b" />
-              <Area type="monotone" dataKey="calories" stackId="2" stroke="#ef4444" fill="#ef4444" />
+              <Area type="monotone" dataKey="duration" stackId="1" stroke="#70E8FF" fill="#70E8FF" fillOpacity={0.6} />
+              <Area type="monotone" dataKey="calories" stackId="2" stroke="#A67DFF" fill="#A67DFF" fillOpacity={0.6} />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>
@@ -246,7 +253,7 @@ const DashboardCharts = memo(function DashboardCharts({
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="hours" stroke="#14b8a6" strokeWidth={2} />
+              <Line type="monotone" dataKey="hours" stroke="#41FAD1" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>

@@ -18,11 +18,19 @@ const DashboardStats = lazy(() => import("@/components/dashboard/DashboardStats"
 const DashboardCharts = lazy(() => import("@/components/dashboard/DashboardCharts"));
 const DashboardFilters = lazy(() => import("@/components/dashboard/DashboardFilters"));
 const HabitsSection = lazy(() => import("@/components/dashboard/HabitsSection"));
+const DailyView = lazy(() => import("@/components/dashboard/DailyView"));
 
 export default function Dashboard() {
   const { isLoading, isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [timeRange, setTimeRange] = useState<"day" | "week" | "month" | "year">("month");
+  // Force Daily as default - no conditional logic
+  const [timeRange, setTimeRange] = useState<"daily" | "week" | "month" | "year">("daily");
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Ensure Daily tab is always rendered first, even before data loads
+  useEffect(() => {
+    setIsInitialized(true);
+  }, []);
   
   // Filter states
   const [taskAreaFilter, setTaskAreaFilter] = useState<string>("all");
@@ -42,7 +50,7 @@ export default function Dashboard() {
   const { startDate: startDateTime, endDateTime } = useMemo(() => {
     const now = new Date();
     const startDate = new Date(now);
-    if (timeRange === "day") {
+    if (timeRange === "daily") {
       startDate.setHours(0, 0, 0, 0);
     } else if (timeRange === "week") {
       startDate.setDate(now.getDate() - 7);
@@ -104,6 +112,7 @@ export default function Dashboard() {
     });
   }, [habits, habitFrequencyFilter]);
 
+  // Show loading only for auth, not for data
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -112,6 +121,7 @@ export default function Dashboard() {
     );
   }
 
+  // Allow rendering even if data is still loading - Daily tab must show immediately
   const isDataLoading = !tasks || !taskStats || !dailyLogs || !habits || !books || !financeStats || !workoutStats;
 
   const filters = {
@@ -137,6 +147,9 @@ export default function Dashboard() {
     setHabitFrequencyFilter("all");
     setBookStatusFilter("all");
   };
+
+  // Show Daily View when daily tab is selected
+  const showDailyView = timeRange === "daily";
 
   return (
     <div className="min-h-screen bg-background">
@@ -165,73 +178,84 @@ export default function Dashboard() {
       <main className="container mx-auto px-4 py-4 md:py-8 pb-20 md:pb-8">
         <TrialBanner />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mt-4">
-          {/* Time Range Selector */}
+          {/* Time Range Selector - Daily is ALWAYS first and emphasized with neon glow */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="flex items-center gap-2">
               <Filter className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm font-medium">Filters Active</span>
+              <span className="text-sm font-medium">View Mode</span>
             </div>
             <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
-              <TabsList>
-                <TabsTrigger value="day">Day</TabsTrigger>
-                <TabsTrigger value="week">Week</TabsTrigger>
-                <TabsTrigger value="month">Month</TabsTrigger>
-                <TabsTrigger value="year">Year</TabsTrigger>
+              <TabsList className="bg-card/50 backdrop-blur-sm border border-border/50">
+                <TabsTrigger value="daily" className="hover:bg-accent/30 transition-all">
+                  Daily
+                </TabsTrigger>
+                <TabsTrigger value="week" className="hover:bg-accent/30 transition-all">Week</TabsTrigger>
+                <TabsTrigger value="month" className="hover:bg-accent/30 transition-all">Month</TabsTrigger>
+                <TabsTrigger value="year" className="hover:bg-accent/30 transition-all">Year</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
 
-          {/* Lazy loaded components with suspense */}
-          <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
-            <DashboardFilters 
-              filters={filters}
-              resetFilters={resetFilters}
-              financeStats={financeStats}
-              habits={habits}
-              books={books}
-            />
-          </Suspense>
-
-          {isDataLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin" />
-            </div>
+          {/* ALWAYS render Daily view first - no conditional delays */}
+          {timeRange === "daily" ? (
+            <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+              <DailyView />
+            </Suspense>
           ) : (
             <>
-              <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
-                <DashboardStats
-                  tasks={tasks || []}
-                  taskStats={taskStats}
-                  dailyStats={dailyStats}
-                  financeStats={financeStats}
-                  readingStats={readingStats}
-                  books={books || []}
+              {/* Lazy loaded components with suspense */}
+              <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+                <DashboardFilters 
                   filters={filters}
-                  startDate={startDateTime}
-                  endDate={endDateTime}
+                  resetFilters={resetFilters}
+                  financeStats={financeStats}
+                  habits={habits}
+                  books={books}
                 />
               </Suspense>
 
-              <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
-                <DashboardCharts
-                  tasks={tasks || []}
-                  dailyLogs={dailyLogs || []}
-                  financeStats={financeStats}
-                  workoutStats={workoutStats}
-                  sleepLogs={sleepLogs || []}
-                  filters={filters}
-                  startDate={startDateTime}
-                  endDate={endDateTime}
-                />
-              </Suspense>
+              {isDataLoading ? (
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : (
+                <>
+                  <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
+                    <DashboardStats
+                      tasks={tasks || []}
+                      taskStats={taskStats}
+                      dailyStats={dailyStats}
+                      financeStats={financeStats}
+                      readingStats={readingStats}
+                      books={books || []}
+                      filters={filters}
+                      startDate={startDateTime}
+                      endDate={endDateTime}
+                    />
+                  </Suspense>
 
-              <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
-                <HabitsSection 
-                  habits={filteredHabits} 
-                  startDate={startDateTime} 
-                  endDate={endDateTime} 
-                />
-              </Suspense>
+                  <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
+                    <DashboardCharts
+                      tasks={tasks || []}
+                      dailyLogs={dailyLogs || []}
+                      financeStats={financeStats}
+                      workoutStats={workoutStats}
+                      sleepLogs={sleepLogs || []}
+                      filters={filters}
+                      startDate={startDateTime}
+                      endDate={endDateTime}
+                    />
+                  </Suspense>
+
+                  <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
+                    <HabitsSection 
+                      habits={filteredHabits} 
+                      startDate={startDateTime} 
+                      endDate={endDateTime} 
+                    />
+                  </Suspense>
+                </>
+              )}
             </>
           )}
         </motion.div>
