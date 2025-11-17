@@ -21,13 +21,16 @@ const HabitsSection = lazy(() => import("@/components/dashboard/HabitsSection"))
 const DailyView = lazy(() => import("@/components/dashboard/DailyView"));
 
 export default function Dashboard() {
+  const { isLoading, isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
   // Force Daily as default - no conditional logic
   const [timeRange, setTimeRange] = useState<"daily" | "week" | "month" | "year">("daily");
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Call useAuth hook - must be at top level
-  const { isLoading, isAuthenticated, user, signOut } = useAuth();
+  // Ensure Daily tab is always rendered first, even before data loads
+  useEffect(() => {
+    setIsInitialized(true);
+  }, []);
   
   // Filter states
   const [taskAreaFilter, setTaskAreaFilter] = useState<string>("all");
@@ -36,11 +39,6 @@ export default function Dashboard() {
   const [expenseCategoryFilter, setExpenseCategoryFilter] = useState<string>("all");
   const [habitFrequencyFilter, setHabitFrequencyFilter] = useState<string>("all");
   const [bookStatusFilter, setBookStatusFilter] = useState<string>("all");
-
-  // Ensure Daily tab is always rendered first, even before data loads
-  useEffect(() => {
-    setIsInitialized(true);
-  }, []);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -124,7 +122,7 @@ export default function Dashboard() {
   }
 
   // Allow rendering even if data is still loading - Daily tab must show immediately
-  const isDataLoading = !tasks || !taskStats || !dailyLogs || !dailyStats || !habits || !books || !readingStats || !financeStats || !workoutStats;
+  const isDataLoading = !tasks || !taskStats || !dailyLogs || !habits || !books || !financeStats || !workoutStats;
 
   const filters = {
     taskAreaFilter,
@@ -160,7 +158,7 @@ export default function Dashboard() {
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 md:gap-4">
-            <img src="/logo.svg" alt="Logo" className="h-8 w-8 md:h-10 md:w-10 cursor-pointer" onClick={() => navigate("/")} loading="eager" />
+            <img src="./logo.svg" alt="Logo" className="h-8 w-8 md:h-10 md:w-10 cursor-pointer" onClick={() => navigate("/")} loading="eager" />
             <div className="hidden sm:block">
               <h1 className="text-lg md:text-2xl font-bold tracking-tight">ACCELERA Dashboard</h1>
               <p className="text-xs md:text-sm text-muted-foreground hidden md:block">Welcome back, {user.name || user.email || "User"}</p>
@@ -209,21 +207,15 @@ export default function Dashboard() {
           ) : (
             <>
               {/* Lazy loaded components with suspense */}
-              {habits && books && financeStats ? (
-                <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
-                  <DashboardFilters 
-                    filters={filters}
-                    resetFilters={resetFilters}
-                    financeStats={financeStats}
-                    habits={habits}
-                    books={books}
-                  />
-                </Suspense>
-              ) : (
-                <div className="flex items-center justify-center py-20">
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                </div>
-              )}
+              <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+                <DashboardFilters 
+                  filters={filters}
+                  resetFilters={resetFilters}
+                  financeStats={financeStats}
+                  habits={habits}
+                  books={books}
+                />
+              </Suspense>
 
               {isDataLoading ? (
                 <div className="flex items-center justify-center py-20">

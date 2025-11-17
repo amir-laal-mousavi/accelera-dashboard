@@ -47,32 +47,6 @@ export const create = mutation({
   },
 });
 
-export const update = mutation({
-  args: {
-    id: v.id("workoutLogs"),
-    session: v.string(),
-    exercise: v.string(),
-    sets: v.optional(v.number()),
-    repsPerSet: v.optional(v.number()),
-    weight: v.optional(v.number()),
-    duration: v.optional(v.number()),
-    calories: v.optional(v.number()),
-    intensity: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    const { id, ...updates } = args;
-    const workout = await ctx.db.get(id);
-    if (!workout || workout.userId !== userId) {
-      throw new Error("Workout not found or unauthorized");
-    }
-
-    await ctx.db.patch(id, updates);
-  },
-});
-
 export const remove = mutation({
   args: { id: v.id("workoutLogs") },
   handler: async (ctx, args) => {

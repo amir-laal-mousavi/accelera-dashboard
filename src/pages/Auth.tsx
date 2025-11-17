@@ -1,4 +1,3 @@
-// Force cache invalidation - updated 2025-01-14 13:22:45
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -202,14 +201,20 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       disabled={isLoading}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && otp.length === 6 && !isLoading) {
+                          // Find the closest form and submit it
                           const form = (e.target as HTMLElement).closest("form");
                           if (form) {
                             form.requestSubmit();
                           }
                         }
                       }}
-                      placeholder="000000"
-                    />
+                    >
+                      <InputOTPGroup>
+                        {Array.from({ length: 6 }).map((_, index) => (
+                          <InputOTPSlot key={index} index={index} />
+                        ))}
+                      </InputOTPGroup>
+                    </InputOTP>
                   </div>
                   {error && (
                     <p className="mt-2 text-sm text-red-500 text-center">

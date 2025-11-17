@@ -42,31 +42,6 @@ export const addWater = mutation({
   },
 });
 
-export const updateWater = mutation({
-  args: {
-    id: v.id("waterLogs"),
-    amount: v.number(),
-    goal: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
-  },
-});
-
-export const deleteWater = mutation({
-  args: { id: v.id("waterLogs") },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    await ctx.db.delete(args.id);
-  },
-});
-
 // Caffeine logs
 export const listCaffeine = query({
   args: {
@@ -106,33 +81,6 @@ export const addCaffeine = mutation({
       userId,
       ...args,
     });
-  },
-});
-
-export const updateCaffeine = mutation({
-  args: {
-    id: v.id("caffeineLogs"),
-    drink: v.string(),
-    type: v.string(),
-    volume: v.number(),
-    caffeine: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
-  },
-});
-
-export const deleteCaffeine = mutation({
-  args: { id: v.id("caffeineLogs") },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    await ctx.db.delete(args.id);
   },
 });
 
@@ -176,31 +124,6 @@ export const addSleep = mutation({
   },
 });
 
-export const updateSleep = mutation({
-  args: {
-    id: v.id("sleepLogs"),
-    duration: v.number(),
-    notes: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
-  },
-});
-
-export const deleteSleep = mutation({
-  args: { id: v.id("sleepLogs") },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    await ctx.db.delete(args.id);
-  },
-});
-
 // Weight logs
 export const listWeight = query({
   args: {},
@@ -228,29 +151,5 @@ export const addWeight = mutation({
       userId,
       ...args,
     });
-  },
-});
-
-export const updateWeight = mutation({
-  args: {
-    id: v.id("weightLogs"),
-    weight: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
-  },
-});
-
-export const deleteWeight = mutation({
-  args: { id: v.id("weightLogs") },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    await ctx.db.delete(args.id);
   },
 });

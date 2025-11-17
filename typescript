@@ -1,6 +1,6 @@
-// Current use-auth.ts should be:
-import { useAuth as useAuthContext } from "@/contexts/AuthContext";
-
-export function useAuth() {
-  return useAuthContext();
-}
+const copyToClipboard = () => {
+  if (calculatedCalories !== null) {
+    navigator.clipboard.writeText(`${calculatedCalories} kcal`);
+    toast.success("Copied to clipboard!");
+  }
+};

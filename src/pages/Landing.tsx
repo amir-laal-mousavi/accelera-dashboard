@@ -7,8 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Check, Sparkles } from "lucide-react";
 
 export default function Landing() {
-  const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuth();
 
   return (
     <motion.div
