@@ -1,31 +1,7 @@
-import { api } from "@/convex/_generated/api";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { useConvexAuth, useQuery } from "convex/react";
+// This file is now deprecated - use the AuthContext instead
+// Keeping for backward compatibility
+import { useAuth as useAuthContext } from "@/contexts/AuthContext";
 
-import { useEffect, useState } from "react";
-
-// Hook order fix: useState must be called first
 export function useAuth() {
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Call hooks in consistent order
-  const { isLoading: isAuthLoading, isAuthenticated } = useConvexAuth();
-  const user = useQuery(api.users.currentUser);
-  const { signIn, signOut } = useAuthActions();
-
-  // This effect updates the loading state once auth is loaded and user data is available
-  // It ensures we only show content when both authentication state and user data are ready
-  useEffect(() => {
-    if (!isAuthLoading && user !== undefined) {
-      setIsLoading(false);
-    }
-  }, [isAuthLoading, user]);
-
-  return {
-    isLoading,
-    isAuthenticated,
-    user,
-    signIn,
-    signOut,
-  };
+  return useAuthContext();
 }
