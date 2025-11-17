@@ -165,8 +165,8 @@ const DailyView = memo(function DailyView() {
 
   return (
     <div className="space-y-6">
-      {/* Date Navigation with subtle accent */}
-      <Card className="border-2 border-accent-teal/30 neon-card-hover bg-gradient-to-br from-accent-teal/5 to-transparent">
+      {/* Date Navigation with neon accent */}
+      <Card className="border-2 border-accent-teal/20 neon-card-hover">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -185,11 +185,7 @@ const DailyView = memo(function DailyView() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               {!isToday && (
-                <Button 
-                  variant="outline" 
-                  onClick={goToToday} 
-                  className="border-accent-teal/40 hover:bg-accent-teal/15 hover:shadow-[0_0_12px_rgba(46,234,229,0.2)] transition-all"
-                >
+                <Button variant="outline" onClick={goToToday} className="border-accent-teal/30 hover:bg-accent-teal/10">
                   Today
                 </Button>
               )}
@@ -256,39 +252,27 @@ const DailyView = memo(function DailyView() {
 
       {/* Charts Row with neon ambient glow */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="neon-card-hover chart-gradient-teal border-accent-teal/20">
+        <Card className="neon-card-hover chart-gradient-teal">
           <CardHeader>
-            <CardTitle className="text-accent-purple">Tasks by Area</CardTitle>
+            <CardTitle>Tasks by Area</CardTitle>
             <CardDescription>Distribution for today</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={tasksByArea}>
-                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.70 0.18 180 / 0.1)" />
-                <XAxis dataKey="area" stroke="oklch(0.65 0 0 / 0.6)" />
-                <YAxis stroke="oklch(0.65 0 0 / 0.6)" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'oklch(0.12 0 0 / 0.95)', 
-                    border: '1px solid oklch(0.70 0.18 180 / 0.3)',
-                    borderRadius: '8px'
-                  }} 
-                />
-                <Bar dataKey="count" fill="url(#purpleGradient)" radius={[8, 8, 0, 0]} />
-                <defs>
-                  <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#A67DFF" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#6E4AFF" stopOpacity={0.7} />
-                  </linearGradient>
-                </defs>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="area" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#6E4AFF" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card className="neon-card-hover chart-gradient-purple border-accent-purple/20">
+        <Card className="neon-card-hover chart-gradient-purple">
           <CardHeader>
-            <CardTitle className="text-accent-cyan">Time Distribution</CardTitle>
+            <CardTitle>Time Distribution</CardTitle>
             <CardDescription>How you spent your day</CardDescription>
           </CardHeader>
           <CardContent>
@@ -303,20 +287,12 @@ const DailyView = memo(function DailyView() {
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
-                  stroke="oklch(0.12 0 0)"
-                  strokeWidth={2}
                 >
                   {timeDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'oklch(0.12 0 0 / 0.95)', 
-                    border: '1px solid oklch(0.65 0.22 285 / 0.3)',
-                    borderRadius: '8px'
-                  }} 
-                />
+                <Tooltip />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>

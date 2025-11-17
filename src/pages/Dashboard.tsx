@@ -1,4 +1,3 @@
-// Cache bust: 2025-01-14-13:29:15
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -187,10 +186,7 @@ export default function Dashboard() {
             </div>
             <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
               <TabsList className="bg-card/50 backdrop-blur-sm border border-border/50">
-                <TabsTrigger 
-                  value="daily" 
-                  className="hover:bg-accent/30 transition-all data-[state=active]:daily-tab-active"
-                >
+                <TabsTrigger value="daily" className="hover:bg-accent/30 transition-all">
                   Daily
                 </TabsTrigger>
                 <TabsTrigger value="week" className="hover:bg-accent/30 transition-all">Week</TabsTrigger>
