@@ -25,7 +25,6 @@ import type * as habits from "../habits.js";
 import type * as health from "../health.js";
 import type * as http from "../http.js";
 import type * as seed from "../seed.js";
-import type * as setAdmin from "../setAdmin.js";
 import type * as tasks from "../tasks.js";
 import type * as trial from "../trial.js";
 import type * as users from "../users.js";
@@ -52,7 +51,6 @@ declare const fullApi: ApiFromModules<{
   health: typeof health;
   http: typeof http;
   seed: typeof seed;
-  setAdmin: typeof setAdmin;
   tasks: typeof tasks;
   trial: typeof trial;
   users: typeof users;

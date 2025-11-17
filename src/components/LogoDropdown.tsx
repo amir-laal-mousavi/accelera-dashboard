@@ -15,10 +15,8 @@ import { useMobile } from "@/hooks/use-mobile";
 
 export function LogoDropdown() {
   const navigate = useNavigate();
-  const { signOut, user } = useAuth();
+  const { signOut } = useAuth();
   const isMobile = useMobile();
-
-  const isAdmin = user?.role === "admin" || user?.role === "support";
 
   return (
     <DropdownMenu>
@@ -38,20 +36,6 @@ export function LogoDropdown() {
           <Settings className="mr-2 h-4 w-4" />
           Settings
         </DropdownMenuItem>
-        {isAdmin && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs text-muted-foreground">Admin</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigate("/admin")}>
-              <Shield className="mr-2 h-4 w-4" />
-              Admin Dashboard
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/admin/users")}>
-              <User className="mr-2 h-4 w-4" />
-              User Management
-            </DropdownMenuItem>
-          </>
-        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()} className="text-destructive">
           <LogOut className="mr-2 h-4 w-4" />
