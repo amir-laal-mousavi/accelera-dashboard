@@ -1,26 +1,23 @@
-// Cache-bust: v1.0.11 - Force browser cache refresh for React context fixes
+// Cache-bust: v1.0.12 - Fix dynamic import and Router context errors
 import { Toaster } from "@/components/ui/sonner";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { InstrumentationProvider } from "@/instrumentation.tsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
-import { StrictMode, lazy, Suspense, useEffect } from "react";
+import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./index.css";
 import Landing from "./pages/Landing.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
+import AuthPage from "./pages/Auth.tsx";
+import Settings from "./pages/Settings.tsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
+import UserManagement from "./pages/admin/UserManagement.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import "./types/global.d.ts";
-import { Loader2 } from "lucide-react";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
-
-// Lazy load pages for better performance
-const AuthPage = lazy(() => import("@/pages/Auth.tsx"));
-const Dashboard = lazy(() => import("@/pages/Dashboard.tsx"));
-const Settings = lazy(() => import("@/pages/Settings.tsx"));
-const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard.tsx"));
-const UserManagement = lazy(() => import("@/pages/admin/UserManagement.tsx"));
 
 function RouteSyncer() {
   const location = useLocation();
@@ -45,12 +42,6 @@ function RouteSyncer() {
   return null;
 }
 
-const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <Loader2 className="h-8 w-8 animate-spin" />
-  </div>
-);
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <VlyToolbar />
@@ -58,17 +49,15 @@ createRoot(document.getElementById("root")!).render(
       <ConvexAuthProvider client={convex}>
         <BrowserRouter>
           <RouteSyncer />
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/auth" element={<AuthPage redirectAfterAuth="/dashboard" />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/users" element={<UserManagement />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/auth" element={<AuthPage redirectAfterAuth="/dashboard" />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
         <Toaster />
       </ConvexAuthProvider>

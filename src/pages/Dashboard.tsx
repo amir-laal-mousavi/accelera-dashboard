@@ -1,9 +1,9 @@
-// Cache-bust: v1.0.11 - Force browser cache refresh for React context fixes
+// Cache-bust: v1.0.12 - Fix dynamic import errors
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useNavigate } from "react-router";
-import { useEffect, useState, useMemo, lazy, Suspense } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { TrialBanner } from "@/components/TrialBanner";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { motion } from "framer-motion";
@@ -13,13 +13,11 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LogoDropdown } from "@/components/LogoDropdown";
-
-// Lazy load heavy components
-const DashboardStats = lazy(() => import("@/components/dashboard/DashboardStats"));
-const DashboardCharts = lazy(() => import("@/components/dashboard/DashboardCharts"));
-const DashboardFilters = lazy(() => import("@/components/dashboard/DashboardFilters"));
-const HabitsSection = lazy(() => import("@/components/dashboard/HabitsSection"));
-const DailyView = lazy(() => import("@/components/dashboard/DailyView"));
+import DashboardStats from "@/components/dashboard/DashboardStats";
+import DashboardCharts from "@/components/dashboard/DashboardCharts";
+import DashboardFilters from "@/components/dashboard/DashboardFilters";
+import HabitsSection from "@/components/dashboard/HabitsSection";
+import DailyView from "@/components/dashboard/DailyView";
 
 export default function Dashboard() {
   const { isLoading, isAuthenticated, user, signOut } = useAuth();
@@ -199,21 +197,16 @@ export default function Dashboard() {
 
           {/* ALWAYS render Daily view first - no conditional delays */}
           {timeRange === "daily" ? (
-            <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
-              <DailyView />
-            </Suspense>
+            <DailyView />
           ) : (
             <>
-              {/* Lazy loaded components with suspense */}
-              <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
-                <DashboardFilters 
-                  filters={filters}
-                  resetFilters={resetFilters}
-                  financeStats={financeStats}
-                  habits={habits}
-                  books={books}
-                />
-              </Suspense>
+              <DashboardFilters 
+                filters={filters}
+                resetFilters={resetFilters}
+                financeStats={financeStats}
+                habits={habits}
+                books={books}
+              />
 
               {isDataLoading ? (
                 <div className="flex items-center justify-center py-20">
@@ -221,40 +214,34 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <>
-                  <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
-                    <DashboardStats
-                      tasks={tasks || []}
-                      taskStats={taskStats}
-                      dailyStats={dailyStats}
-                      financeStats={financeStats}
-                      readingStats={readingStats}
-                      books={books || []}
-                      filters={filters}
-                      startDate={startDateTime}
-                      endDate={endDateTime}
-                    />
-                  </Suspense>
+                  <DashboardStats
+                    tasks={tasks || []}
+                    taskStats={taskStats}
+                    dailyStats={dailyStats}
+                    financeStats={financeStats}
+                    readingStats={readingStats}
+                    books={books || []}
+                    filters={filters}
+                    startDate={startDateTime}
+                    endDate={endDateTime}
+                  />
 
-                  <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
-                    <DashboardCharts
-                      tasks={tasks || []}
-                      dailyLogs={dailyLogs || []}
-                      financeStats={financeStats}
-                      workoutStats={workoutStats}
-                      sleepLogs={sleepLogs || []}
-                      filters={filters}
-                      startDate={startDateTime}
-                      endDate={endDateTime}
-                    />
-                  </Suspense>
+                  <DashboardCharts
+                    tasks={tasks || []}
+                    dailyLogs={dailyLogs || []}
+                    financeStats={financeStats}
+                    workoutStats={workoutStats}
+                    sleepLogs={sleepLogs || []}
+                    filters={filters}
+                    startDate={startDateTime}
+                    endDate={endDateTime}
+                  />
 
-                  <Suspense fallback={<div className="flex items-center justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
-                    <HabitsSection 
-                      habits={filteredHabits} 
-                      startDate={startDateTime} 
-                      endDate={endDateTime} 
-                    />
-                  </Suspense>
+                  <HabitsSection 
+                    habits={filteredHabits} 
+                    startDate={startDateTime} 
+                    endDate={endDateTime} 
+                  />
                 </>
               )}
             </>
