@@ -186,7 +186,10 @@ export default function Dashboard() {
             </div>
             <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
               <TabsList className="bg-card/50 backdrop-blur-sm border border-border/50">
-                <TabsTrigger value="daily" className="hover:bg-accent/30 transition-all">
+                <TabsTrigger 
+                  value="daily" 
+                  className="hover:bg-accent/30 transition-all data-[state=active]:daily-tab-active"
+                >
                   Daily
                 </TabsTrigger>
                 <TabsTrigger value="week" className="hover:bg-accent/30 transition-all">Week</TabsTrigger>
