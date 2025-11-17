@@ -1,4 +1,4 @@
-// Cache-bust: v1.0.9 - Force fresh build after infrastructure issues
+// Cache-bust: v1.0.11 - Force browser cache refresh for React context fixes
 import { Toaster } from "@/components/ui/sonner";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { InstrumentationProvider } from "@/instrumentation.tsx";

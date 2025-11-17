@@ -1,4 +1,4 @@
-// Cache-bust: v1.0.10 - Force fresh build for Dashboard after React context fixes
+// Cache-bust: v1.0.11 - Force browser cache refresh for React context fixes
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";

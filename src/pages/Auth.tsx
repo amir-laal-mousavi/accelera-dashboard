@@ -1,3 +1,4 @@
+// Cache-bust: v1.0.11 - Force browser cache refresh for React context fixes
 import { Button } from "@/components/ui/button";
 import {
   Card,
