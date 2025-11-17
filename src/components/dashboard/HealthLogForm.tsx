@@ -101,7 +101,7 @@ export function HealthLogForm({ date }: HealthLogFormProps) {
           Add Health Log
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Health Log</DialogTitle>
           <DialogDescription>Track your water intake, sleep, and more</DialogDescription>
@@ -114,7 +114,7 @@ export function HealthLogForm({ date }: HealthLogFormProps) {
           </TabsList>
 
           <TabsContent value="water">
-            <form onSubmit={handleSubmitWater} className="space-y-4">
+            <form onSubmit={handleSubmitWater} className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
               <div className="space-y-2">
                 <Label htmlFor="waterAmount">Amount (ml) *</Label>
                 <Input
@@ -138,7 +138,7 @@ export function HealthLogForm({ date }: HealthLogFormProps) {
                 />
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="sticky bottom-0 bg-background pt-4 border-t">
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
@@ -150,7 +150,7 @@ export function HealthLogForm({ date }: HealthLogFormProps) {
           </TabsContent>
 
           <TabsContent value="sleep">
-            <form onSubmit={handleSubmitSleep} className="space-y-4">
+            <form onSubmit={handleSubmitSleep} className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
               <div className="space-y-2">
                 <Label htmlFor="sleepDuration">Duration (hours) *</Label>
                 <Input
@@ -174,7 +174,7 @@ export function HealthLogForm({ date }: HealthLogFormProps) {
                 />
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="sticky bottom-0 bg-background pt-4 border-t">
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                   Cancel
                 </Button>

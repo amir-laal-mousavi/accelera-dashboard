@@ -38,6 +38,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       navigate(redirect);
     }
   }, [authLoading, isAuthenticated, navigate, redirectAfterAuth]);
+  
   const handleEmailSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
@@ -98,13 +99,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-
-      
+    <div className="min-h-screen flex flex-col overflow-y-auto">
       {/* Auth Content */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="flex items-center justify-center h-full flex-col">
-        <Card className="min-w-[350px] pb-0 border shadow-md">
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="flex items-center justify-center h-full flex-col w-full max-w-md">
+        <Card className="w-full pb-0 border shadow-md">
           {step === "signIn" ? (
             <>
               <CardHeader className="text-center">
@@ -124,7 +123,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleEmailSubmit}>
-                <CardContent>
+                <CardContent className="max-h-[60vh] overflow-y-auto">
                   
                   <div className="relative flex items-center gap-2">
                     <div className="relative flex-1">
@@ -190,7 +189,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleOtpSubmit}>
-                <CardContent className="pb-4">
+                <CardContent className="pb-4 max-h-[60vh] overflow-y-auto">
                   <input type="hidden" name="email" value={step.email} />
                   <input type="hidden" name="code" value={otp} />
 
@@ -202,7 +201,6 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       disabled={isLoading}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && otp.length === 6 && !isLoading) {
-                          // Find the closest form and submit it
                           const form = (e.target as HTMLElement).closest("form");
                           if (form) {
                             form.requestSubmit();

@@ -81,13 +81,13 @@ export function WorkoutForm() {
           Log Workout
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Log Workout</DialogTitle>
           <DialogDescription>Track your exercise session</DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
           <div className="space-y-2">
             <Label htmlFor="session">Session Name *</Label>
             <Input
@@ -196,7 +196,7 @@ export function WorkoutForm() {
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="sticky bottom-0 bg-background pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>

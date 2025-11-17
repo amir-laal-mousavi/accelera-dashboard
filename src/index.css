@@ -133,7 +133,18 @@
   }
   body {
     @apply bg-background text-foreground transition-colors duration-150;
+    /* Ensure body is always scrollable on mobile */
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
+  
+  /* Ensure root container is scrollable */
+  #root {
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+  
   button:not([disabled]),
   [role="button"]:not([disabled]) {
     cursor: pointer;
@@ -172,6 +183,27 @@
   .dark .bg-card\/50 {
     background: oklch(0.12 0 0 / 0.5);
     backdrop-filter: blur(12px);
+  }
+  
+  /* Mobile scrollable modals and dialogs */
+  @media (max-width: 640px) {
+    [role="dialog"] {
+      max-height: 90vh !important;
+      overflow-y: auto !important;
+    }
+    
+    [role="dialog"] > div {
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+  }
+  
+  /* Ensure forms are scrollable on mobile */
+  @media (max-width: 640px) {
+    form {
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
   }
   
   /* NEW: Accent Color Utilities */

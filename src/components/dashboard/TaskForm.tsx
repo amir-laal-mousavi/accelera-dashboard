@@ -135,7 +135,7 @@ export function TaskForm({ task }: TaskFormProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{task ? "Edit Task" : "Create New Task"}</DialogTitle>
           <DialogDescription>
@@ -143,7 +143,7 @@ export function TaskForm({ task }: TaskFormProps) {
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
           <div className="space-y-2">
             <Label htmlFor="taskName">Task Name *</Label>
             <Input
@@ -241,7 +241,7 @@ export function TaskForm({ task }: TaskFormProps) {
             />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="sticky bottom-0 bg-background pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>

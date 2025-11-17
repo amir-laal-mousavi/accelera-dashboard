@@ -97,7 +97,7 @@ export function DailyLogForm({ date, existingLog }: DailyLogFormProps) {
           {existingLog ? "Edit Log" : "Add Log"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{existingLog ? "Edit Daily Log" : "Add Daily Log"}</DialogTitle>
           <DialogDescription>
@@ -105,7 +105,7 @@ export function DailyLogForm({ date, existingLog }: DailyLogFormProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
           <div className="space-y-2">
             <Label htmlFor="mood">Mood</Label>
             <Select value={mood} onValueChange={setMood}>
@@ -161,7 +161,7 @@ export function DailyLogForm({ date, existingLog }: DailyLogFormProps) {
             />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="sticky bottom-0 bg-background pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
