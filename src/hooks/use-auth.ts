@@ -11,13 +11,13 @@ export function useAuth() {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // This effect updates the loading state once auth is loaded and user data is available
-  // It ensures we only show content when both authentication state and user data are ready
+  // Fix infinite loop: only depend on isAuthLoading, not user
+  // user can change frequently and cause re-renders
   useEffect(() => {
-    if (!isAuthLoading && user !== undefined) {
+    if (!isAuthLoading) {
       setIsLoading(false);
     }
-  }, [isAuthLoading, user]);
+  }, [isAuthLoading]);
 
   return {
     isLoading,
