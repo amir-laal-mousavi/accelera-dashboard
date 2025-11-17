@@ -23,25 +23,13 @@
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
   <script>
-    // Force unregister old service workers and register new one
+    // Smart service worker registration - only clear caches when needed
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', async () => {
         try {
-          // Unregister all existing service workers first
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          for (let registration of registrations) {
-            await registration.unregister();
-            console.log('Old service worker unregistered');
-          }
-          
-          // Clear all caches
-          const cacheNames = await caches.keys();
-          await Promise.all(cacheNames.map(name => caches.delete(name)));
-          console.log('All caches cleared');
-          
-          // Register new service worker
+          // Register service worker
           const reg = await navigator.serviceWorker.register('/sw.js');
-          console.log('New Service Worker registered');
+          console.log('Service Worker registered');
           
           // Check for updates immediately
           reg.update();
@@ -51,8 +39,20 @@
             const newWorker = reg.installing;
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('New version available! Reloading...');
-                window.location.reload();
+                // New service worker available - clear old caches and reload
+                console.log('New version detected! Clearing old caches...');
+                caches.keys().then(cacheNames => {
+                  return Promise.all(
+                    cacheNames.map(name => {
+                      if (name !== 'accelera-v4') {
+                        return caches.delete(name);
+                      }
+                    })
+                  );
+                }).then(() => {
+                  console.log('Old caches cleared. Reloading...');
+                  window.location.reload();
+                });
               }
             });
           });
