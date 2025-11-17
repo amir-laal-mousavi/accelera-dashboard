@@ -36,8 +36,8 @@ const DailyView = memo(function DailyView() {
     return today.getTime();
   });
 
-  const toggleTaskDone = useMutation(api.tasks.update);
-  const toggleHabitCompletion = useMutation(api.habits.toggleCompletion);
+  const toggleTaskDone = useMutation((api as any).tasks.update);
+  const toggleHabitCompletion = useMutation((api as any).habits.toggleCompletion);
 
   // Calculate date range for the selected day
   const { startOfDay, endOfDay } = useMemo(() => {
@@ -52,26 +52,26 @@ const DailyView = memo(function DailyView() {
   }, [selectedDate]);
 
   // Fetch data for the selected day
-  const tasks = useQuery(api.tasks.list, {});
-  const dailyLog = useQuery(api.dailyLogs.getByDate, { date: selectedDate });
-  const habits = useQuery(api.habits.list, {});
-  const habitCompletions = useQuery(api.habits.getAggregatedStats, {
+  const tasks = useQuery((api as any).tasks.list, {});
+  const dailyLog = useQuery((api as any).dailyLogs.getByDate, { date: selectedDate });
+  const habits = useQuery((api as any).habits.list, {});
+  const habitCompletions = useQuery((api as any).habits.getAggregatedStats, {
     startDate: startOfDay,
     endDate: endOfDay,
   });
-  const waterLogs = useQuery(api.health.listWater, {
+  const waterLogs = useQuery((api as any).health.listWater, {
     startDate: startOfDay,
     endDate: endOfDay,
   });
-  const sleepLogs = useQuery(api.health.listSleep, {
+  const sleepLogs = useQuery((api as any).health.listSleep, {
     startDate: startOfDay,
     endDate: endOfDay,
   });
-  const workouts = useQuery(api.workouts.list, {
+  const workouts = useQuery((api as any).workouts.list, {
     startDate: startOfDay,
     endDate: endOfDay,
   });
-  const readingSessions = useQuery(api.books.listSessions, {
+  const readingSessions = useQuery((api as any).books.listSessions, {
     startDate: startOfDay,
     endDate: endOfDay,
   });
@@ -79,7 +79,7 @@ const DailyView = memo(function DailyView() {
   // Filter tasks for the selected day
   const dailyTasks = useMemo(() => {
     if (!tasks) return [];
-    return tasks.filter((task) => {
+    return tasks.filter((task: any) => {
       if (!task.scheduled) return false;
       const taskDate = new Date(task.scheduled);
       taskDate.setHours(0, 0, 0, 0);
@@ -109,21 +109,21 @@ const DailyView = memo(function DailyView() {
   };
 
   // Calculate stats
-  const completedTasks = dailyTasks.filter((t) => t.done).length;
+  const completedTasks = dailyTasks.filter((t: any) => t.done).length;
   const totalTasks = dailyTasks.length;
   const taskCompletionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
   const totalWater = useMemo(() => {
     if (!waterLogs || waterLogs.length === 0) return 0;
-    return waterLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
+    return waterLogs.reduce((sum: any, log: any) => sum + (log.amount || 0), 0);
   }, [waterLogs]);
-  const totalWorkoutMinutes = workouts?.reduce((sum, w) => sum + (w.duration || 0), 0) || 0;
-  const totalReadingMinutes = readingSessions?.reduce((sum, s) => sum + s.minutes, 0) || 0;
+  const totalWorkoutMinutes = workouts?.reduce((sum: any, w: any) => sum + (w.duration || 0), 0) || 0;
+  const totalReadingMinutes = readingSessions?.reduce((sum: any, s: any) => sum + s.minutes, 0) || 0;
 
   // Prepare chart data - tasks by area
   const tasksByArea = useMemo(() => {
     const areaCount: Record<string, number> = {};
-    dailyTasks.forEach((task) => {
+    dailyTasks.forEach((task: any) => {
       areaCount[task.area] = (areaCount[task.area] || 0) + 1;
     });
     return Object.entries(areaCount).map(([area, count]) => ({ area, count }));
@@ -244,7 +244,7 @@ const DailyView = memo(function DailyView() {
           <CardContent>
             <div className="text-2xl font-bold">{totalReadingMinutes}min</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {readingSessions?.reduce((sum, s) => sum + (s.endPage - s.startPage), 0) || 0} pages
+              {readingSessions?.reduce((sum: any, s: any) => sum + (s.endPage - s.startPage), 0) || 0} pages
             </p>
           </CardContent>
         </Card>
@@ -317,7 +317,7 @@ const DailyView = memo(function DailyView() {
                 No tasks scheduled for this day
               </p>
             ) : (
-              dailyTasks.map((task) => (
+              dailyTasks.map((task: any) => (
                 <div
                   key={task._id}
                   className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
@@ -376,8 +376,8 @@ const DailyView = memo(function DailyView() {
               </p>
             ) : (
               habits
-                .filter((h) => h.frequency === "daily" || h.frequency === "Daily")
-                .map((habit) => {
+                .filter((h: any) => h.frequency === "daily" || h.frequency === "Daily")
+                .map((habit: any) => {
                   const isCompleted = (habitCompletions?.dailyCompletions?.[selectedDate] || 0) > 0;
                   return (
                     <div
@@ -483,7 +483,7 @@ const DailyView = memo(function DailyView() {
                   No workouts logged
                 </p>
               ) : (
-                workouts.map((workout) => (
+                workouts.map((workout: any) => (
                   <div
                     key={workout._id}
                     className="p-3 rounded-lg border bg-card"

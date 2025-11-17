@@ -40,7 +40,7 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
   // Get aggregated stats - only when on overview tab
   const shouldFetchStats = activeTab === "overview";
   const aggregatedStats = useQuery(
-    api.habits.getAggregatedStats, 
+    (api as any).habits.getAggregatedStats, 
     shouldFetchStats ? queryArgs : "skip"
   );
 
@@ -141,7 +141,7 @@ export function HabitsSection({ habits, startDate, endDate }: HabitsSectionProps
                 <div className="text-4xl font-bold bg-gradient-to-br from-cyan-500 to-cyan-400 bg-clip-text text-transparent dark:from-cyan-400 dark:to-cyan-300">
                   {Object.keys(aggregatedStats.dailyCompletions).length > 0
                     ? Math.round(
-                        Object.values(aggregatedStats.dailyCompletions).reduce((a, b) => a + b, 0) /
+                        (Object.values(aggregatedStats.dailyCompletions) as any[]).reduce((a: any, b: any) => a + b, 0) /
                           Object.keys(aggregatedStats.dailyCompletions).length
                       )
                     : 0}

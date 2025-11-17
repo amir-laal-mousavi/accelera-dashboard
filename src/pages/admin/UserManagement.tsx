@@ -20,13 +20,13 @@ export default function UserManagement() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [newRole, setNewRole] = useState<string>("");
 
-  const users = useQuery(api.admin.listUsers, {
+  const users = useQuery((api as any).admin.listUsers as any, {
     role: roleFilter === "all" ? undefined : roleFilter,
     status: statusFilter === "all" ? undefined : statusFilter,
   });
 
-  const updateRole = useMutation(api.admin.updateUserRole);
-  const suspendUser = useMutation(api.admin.suspendUser);
+  const updateRole = useMutation((api as any).admin.updateUserRole as any);
+  const suspendUser = useMutation((api as any).admin.suspendUser as any);
 
   const handleUpdateRole = async () => {
     if (!selectedUser || !newRole) return;
@@ -134,7 +134,7 @@ export default function UserManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
+              {users.map((user: any) => (
                 <TableRow key={user._id}>
                   <TableCell className="font-medium">{user.name || "—"}</TableCell>
                   <TableCell>{user.email || "—"}</TableCell>

@@ -28,7 +28,7 @@ export function ExpenseForm() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const addExpense = useMutation(api.finance.addExpense);
+  const addExpense = useMutation((api as any).finance.addExpense);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

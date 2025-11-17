@@ -12,9 +12,9 @@ import {
 import { useEffect } from "react";
 
 export function useOfflineTasks() {
-  const createTaskMutation = useMutation(api.tasks.create);
-  const updateTaskMutation = useMutation(api.tasks.update);
-  const deleteTaskMutation = useMutation(api.tasks.remove);
+  const createTaskMutation = useMutation((api as any).tasks.create);
+  const updateTaskMutation = useMutation((api as any).tasks.update);
+  const deleteTaskMutation = useMutation((api as any).tasks.remove);
 
   // Sync pending operations when online
   useEffect(() => {

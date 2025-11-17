@@ -12,9 +12,9 @@ export function OfflineIndicator() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [pendingCount, setPendingCount] = useState(0);
   
-  const createTaskMutation = useMutation(api.tasks.create);
-  const updateTaskMutation = useMutation(api.tasks.update);
-  const deleteTaskMutation = useMutation(api.tasks.remove);
+  const createTaskMutation = useMutation((api as any).tasks.create);
+  const updateTaskMutation = useMutation((api as any).tasks.update);
+  const deleteTaskMutation = useMutation((api as any).tasks.remove);
 
   useEffect(() => {
     const cleanup = watchOnlineStatus((online) => {

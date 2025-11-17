@@ -38,8 +38,8 @@ export function DailyLogForm({ date, existingLog }: DailyLogFormProps) {
   const [notes, setNotes] = useState(existingLog?.notes || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createLog = useMutation(api.dailyLogs.create);
-  const updateLog = useMutation(api.dailyLogs.update);
+  const createLog = useMutation((api as any).dailyLogs.create);
+  const updateLog = useMutation((api as any).dailyLogs.update);
 
   useEffect(() => {
     if (existingLog) {

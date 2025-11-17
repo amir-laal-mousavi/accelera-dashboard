@@ -35,8 +35,8 @@ export function HealthLogForm({ date }: HealthLogFormProps) {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const addWater = useMutation(api.health.addWater);
-  const addSleep = useMutation(api.health.addSleep);
+  const addWater = useMutation((api as any).health.addWater);
+  const addSleep = useMutation((api as any).health.addSleep);
 
   const handleSubmitWater = async (e: React.FormEvent) => {
     e.preventDefault();

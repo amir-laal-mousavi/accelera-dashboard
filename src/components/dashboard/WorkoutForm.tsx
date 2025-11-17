@@ -30,7 +30,7 @@ export function WorkoutForm() {
   const [intensity, setIntensity] = useState("Medium");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createWorkout = useMutation(api.workouts.create);
+  const createWorkout = useMutation((api as any).workouts.create);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

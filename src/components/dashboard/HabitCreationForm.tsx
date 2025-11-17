@@ -29,7 +29,7 @@ export function HabitCreationForm() {
   const [color, setColor] = useState("#8b5cf6");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createHabit = useMutation(api.habits.create);
+  const createHabit = useMutation((api as any).habits.create);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -65,8 +65,8 @@ export function TaskForm({ task }: TaskFormProps) {
     }
   }, [task, open]);
 
-  const createTask = useMutation(api.tasks.create);
-  const updateTask = useMutation(api.tasks.update);
+  const createTask = useMutation((api as any).tasks.create);
+  const updateTask = useMutation((api as any).tasks.update);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

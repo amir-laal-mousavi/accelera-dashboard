@@ -68,38 +68,38 @@ export default function Dashboard() {
   }, [timeRange]);
 
   // Fetch all data
-  const tasks = useQuery(api.tasks.list, {});
-  const taskStats = useQuery(api.tasks.getStats, {
+  const tasks = useQuery((api as any).tasks.list, {});
+  const taskStats = useQuery((api as any).tasks.getStats, {
     startDate: startDateTime,
     endDate: endDateTime,
   });
-  const dailyLogs = useQuery(api.dailyLogs.list, {
+  const dailyLogs = useQuery((api as any).dailyLogs.list, {
     startDate: startDateTime,
     endDate: endDateTime,
   });
-  const dailyStats = useQuery(api.dailyLogs.getStats, {
+  const dailyStats = useQuery((api as any).dailyLogs.getStats, {
     startDate: startDateTime,
     endDate: endDateTime,
   });
-  const habits = useQuery(api.habits.list, {});
-  const books = useQuery(api.books.list, {});
-  const readingStats = useQuery(api.books.getReadingStats, {
+  const habits = useQuery((api as any).habits.list, {});
+  const books = useQuery((api as any).books.list, {});
+  const readingStats = useQuery((api as any).books.getReadingStats, {
     startDate: startDateTime,
     endDate: endDateTime,
   });
-  const financeStats = useQuery(api.finance.getFinanceStats, {
+  const financeStats = useQuery((api as any).finance.getFinanceStats, {
     startDate: startDateTime,
     endDate: endDateTime,
   });
-  const workoutStats = useQuery(api.workouts.getStats, {
+  const workoutStats = useQuery((api as any).workouts.getStats, {
     startDate: startDateTime,
     endDate: endDateTime,
   });
-  const waterLogs = useQuery(api.health.listWater, {
+  const waterLogs = useQuery((api as any).health.listWater, {
     startDate: startDateTime,
     endDate: endDateTime,
   });
-  const sleepLogs = useQuery(api.health.listSleep, {
+  const sleepLogs = useQuery((api as any).health.listSleep, {
     startDate: startDateTime,
     endDate: endDateTime,
   });
@@ -107,7 +107,7 @@ export default function Dashboard() {
   // Memoize filtered habits to prevent infinite loops
   const filteredHabits = useMemo(() => {
     if (!habits) return [];
-    return habits.filter((habit) => {
+    return habits.filter((habit: any) => {
       return habitFrequencyFilter === "all" || habit.frequency === habitFrequencyFilter;
     });
   }, [habits, habitFrequencyFilter]);

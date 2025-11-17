@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const stats = useQuery(api.admin.getAdminStats);
-  const signupTrend = useQuery(api.admin.getSignupTrend, { days: 30 });
-  const creditStats = useQuery(api.admin.getCreditStats);
+  const stats = useQuery((api as any).admin.getAdminStats);
+  const signupTrend = useQuery((api as any).admin.getSignupTrend, { days: 30 });
+  const creditStats = useQuery((api as any).admin.getCreditStats);
 
   // Check for authorization errors
   useEffect(() => {

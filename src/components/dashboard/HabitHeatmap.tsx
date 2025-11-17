@@ -21,7 +21,7 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
   const [selectedMonth, setSelectedMonth] = useState(() => new Date());
   const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
   
-  const toggleCompletion = useMutation(api.habits.toggleCompletion);
+  const toggleCompletion = useMutation((api as any).habits.toggleCompletion);
 
   // Calculate date range based on view mode
   const { rangeStart, rangeEnd } = useMemo(() => {
@@ -60,7 +60,7 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
     endDate: rangeEnd,
   }), [habitId, rangeStart, rangeEnd]);
 
-  const completions = useQuery(api.habits.getCompletions, completionsArgs);
+  const completions = useQuery((api as any).habits.getCompletions, completionsArgs);
 
   // Build calendar data based on view mode
   const calendarData = useMemo(() => {
@@ -80,7 +80,7 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
         const timestamp = date.getTime();
         const isFuture = timestamp > today;
         
-        const completion = completions.find((c) => {
+        const completion = completions.find((c: any) => {
           const cDate = new Date(c.date).setHours(0, 0, 0, 0);
           return cDate === timestamp;
         });
@@ -134,7 +134,7 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
         const timestamp = date.getTime();
         const isFuture = timestamp > today;
         
-        const completion = completions.find((c) => {
+        const completion = completions.find((c: any) => {
           const cDate = new Date(c.date).setHours(0, 0, 0, 0);
           return cDate === timestamp;
         });
@@ -195,7 +195,7 @@ export function HabitHeatmap({ habitId, habitName, startDate, endDate }: HabitHe
             isFuture: true,
           });
         } else {
-          const monthCompletions = completions.filter((c) => {
+          const monthCompletions = completions.filter((c: any) => {
             const cDate = new Date(c.date);
             return cDate.getFullYear() === selectedYear && cDate.getMonth() === m && c.completed;
           });

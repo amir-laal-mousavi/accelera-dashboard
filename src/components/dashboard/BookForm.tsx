@@ -26,7 +26,7 @@ export function BookForm() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createBook = useMutation(api.books.create);
+  const createBook = useMutation((api as any).books.create);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

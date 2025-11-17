@@ -8,7 +8,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export function TrialBanner() {
-  const trialStatus = useQuery(api.trial.getTrialStatus);
+  const trialStatus = useQuery((api as any).trial.getTrialStatus);
   const [dismissed, setDismissed] = useState(false);
 
   if (!trialStatus || dismissed) return null;
