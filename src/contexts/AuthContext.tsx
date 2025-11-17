@@ -1,8 +1,7 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useState, useEffect } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useState, useEffect } from "react";
 
 interface AuthContextType {
   isLoading: boolean;
@@ -17,6 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   
+  // These hooks require ConvexAuthProvider to be mounted first
   const { isLoading: isAuthLoading, isAuthenticated } = useConvexAuth();
   const user = useQuery(api.users.currentUser);
   const { signIn, signOut } = useAuthActions();
