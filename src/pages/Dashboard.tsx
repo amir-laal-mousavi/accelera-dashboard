@@ -21,11 +21,21 @@ const HabitsSection = lazy(() => import("@/components/dashboard/HabitsSection"))
 const DailyView = lazy(() => import("@/components/dashboard/DailyView"));
 
 export default function Dashboard() {
-  const { isLoading, isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
   // Force Daily as default - no conditional logic
   const [timeRange, setTimeRange] = useState<"daily" | "week" | "month" | "year">("daily");
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // Call useAuth hook - must be at top level
+  const { isLoading, isAuthenticated, user, signOut } = useAuth();
+  
+  // Filter states
+  const [taskAreaFilter, setTaskAreaFilter] = useState<string>("all");
+  const [taskStatusFilter, setTaskStatusFilter] = useState<string>("all");
+  const [taskPriorityFilter, setTaskPriorityFilter] = useState<string>("all");
+  const [expenseCategoryFilter, setExpenseCategoryFilter] = useState<string>("all");
+  const [habitFrequencyFilter, setHabitFrequencyFilter] = useState<string>("all");
+  const [bookStatusFilter, setBookStatusFilter] = useState<string>("all");
 
   // Ensure Daily tab is always rendered first, even before data loads
   useEffect(() => {
