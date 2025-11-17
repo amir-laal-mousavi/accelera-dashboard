@@ -1,4 +1,4 @@
-// Cache-bust: v1.0.12 - Fix dynamic import and Router context errors
+// Cache-bust: v1.0.13 - Force cache invalidation for Router context fix
 import { Toaster } from "@/components/ui/sonner";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { InstrumentationProvider } from "@/instrumentation.tsx";

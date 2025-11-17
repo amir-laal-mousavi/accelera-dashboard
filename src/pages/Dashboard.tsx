@@ -1,4 +1,4 @@
-// Cache-bust: v1.0.12 - Fix dynamic import errors
+// Cache-bust: v1.0.13 - Force cache invalidation for Router context fix
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";

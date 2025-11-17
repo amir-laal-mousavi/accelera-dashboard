@@ -1,4 +1,4 @@
-// Cache-bust: v1.0.12 - Fix Router context error
+// Cache-bust: v1.0.13 - Force cache invalidation for Router context fix
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
