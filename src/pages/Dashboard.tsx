@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useNavigate } from "react-router";
-import { useEffect, useState, useMemo, lazy, Suspense } from "react";
+import { useEffect, useState, useMemo, useCallback, lazy, Suspense } from "react";
 import { TrialBanner } from "@/components/TrialBanner";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { motion } from "framer-motion";
@@ -107,9 +107,8 @@ export default function Dashboard() {
   // Memoize filtered habits to prevent infinite loops
   const filteredHabits = useMemo(() => {
     if (!habits) return [];
-    return habits.filter((habit) => {
-      return habitFrequencyFilter === "all" || habit.frequency === habitFrequencyFilter;
-    });
+    if (habitFrequencyFilter === "all") return habits;
+    return habits.filter((habit) => habit.frequency === habitFrequencyFilter);
   }, [habits, habitFrequencyFilter]);
 
   // Show loading only for auth, not for data
@@ -124,7 +123,7 @@ export default function Dashboard() {
   // Allow rendering even if data is still loading - Daily tab must show immediately
   const isDataLoading = !tasks || !taskStats || !dailyLogs || !habits || !books || !financeStats || !workoutStats;
 
-  const filters = {
+  const filters = useMemo(() => ({
     taskAreaFilter,
     setTaskAreaFilter,
     taskStatusFilter,
@@ -137,16 +136,23 @@ export default function Dashboard() {
     setHabitFrequencyFilter,
     bookStatusFilter,
     setBookStatusFilter,
-  };
+  }), [
+    taskAreaFilter,
+    taskStatusFilter,
+    taskPriorityFilter,
+    expenseCategoryFilter,
+    habitFrequencyFilter,
+    bookStatusFilter,
+  ]);
 
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setTaskAreaFilter("all");
     setTaskStatusFilter("all");
     setTaskPriorityFilter("all");
     setExpenseCategoryFilter("all");
     setHabitFrequencyFilter("all");
     setBookStatusFilter("all");
-  };
+  }, []);
 
   // Show Daily View when daily tab is selected
   const showDailyView = timeRange === "daily";
