@@ -1,37 +1,63 @@
 "use client"
-// Cache bust: 2025-01-14-13:22:45
 
 import * as React from "react"
-import { OTPInput, OTPInputContext } from "input-otp"
-import { MinusIcon } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 
-function InputOTP({
-  className,
-  containerClassName,
-  ...props
-}: React.ComponentProps<typeof OTPInput> & {
+interface InputOTPProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+  value: string
+  onChange: (value: string) => void
+  maxLength?: number
   containerClassName?: string
-}) {
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
+}
+
+function InputOTP({
+  value,
+  onChange,
+  maxLength = 6,
+  containerClassName,
+  onKeyDown,
+  disabled,
+  ...props
+}: InputOTPProps) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.replace(/\D/g, "").slice(0, maxLength)
+    onChange(val)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (onKeyDown) {
+      onKeyDown(e)
+    }
+  }
+
   return (
-    <OTPInput
-      data-slot="input-otp"
-      containerClassName={cn(
-        "flex items-center gap-2 has-disabled:opacity-50",
-        containerClassName
-      )}
-      className={cn("disabled:cursor-not-allowed", className)}
-      {...props}
-    />
+    <div className={cn("flex items-center gap-2", containerClassName)}>
+      <input
+        type="text"
+        inputMode="numeric"
+        value={value}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        maxLength={maxLength}
+        disabled={disabled}
+        className={cn(
+          "w-full text-center text-2xl tracking-widest font-mono",
+          "border border-input rounded-md px-3 py-2",
+          "focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent",
+          "disabled:opacity-50 disabled:cursor-not-allowed",
+          "bg-background"
+        )}
+        {...props}
+      />
+    </div>
   )
 }
 
 function InputOTPGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      data-slot="input-otp-group"
-      className={cn("flex items-center", className)}
+      className={cn("flex items-center gap-1", className)}
       {...props}
     />
   )
@@ -40,37 +66,34 @@ function InputOTPGroup({ className, ...props }: React.ComponentProps<"div">) {
 function InputOTPSlot({
   index,
   className,
+  value = "",
   ...props
 }: React.ComponentProps<"div"> & {
   index: number
+  value?: string
 }) {
-  const inputOTPContext = React.useContext(OTPInputContext)
-  const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {}
+  const char = value?.[index] || ""
 
   return (
     <div
-      data-slot="input-otp-slot"
-      data-active={isActive}
       className={cn(
-        "data-[active=true]:border-ring data-[active=true]:ring-ring/50 data-[active=true]:aria-invalid:ring-destructive/20 dark:data-[active=true]:aria-invalid:ring-destructive/40 aria-invalid:border-destructive data-[active=true]:aria-invalid:border-destructive dark:bg-input/30 border-input relative flex h-9 w-9 items-center justify-center border-y border-r text-sm shadow-xs transition-all outline-none first:rounded-l-md first:border-l last:rounded-r-md data-[active=true]:z-10 data-[active=true]:ring-[3px]",
+        "relative flex h-9 w-9 items-center justify-center",
+        "border border-input rounded-md",
+        "bg-background text-sm font-medium",
+        "focus-within:ring-2 focus-within:ring-ring focus-within:border-transparent",
         className
       )}
       {...props}
     >
       {char}
-      {hasFakeCaret && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="animate-caret-blink bg-foreground h-4 w-px duration-1000" />
-        </div>
-      )}
     </div>
   )
 }
 
 function InputOTPSeparator({ ...props }: React.ComponentProps<"div">) {
   return (
-    <div data-slot="input-otp-separator" role="separator" {...props}>
-      <MinusIcon />
+    <div className="flex items-center justify-center h-9" {...props}>
+      <span className="text-muted-foreground">-</span>
     </div>
   )
 }
