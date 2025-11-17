@@ -1,4 +1,4 @@
-const CACHE_NAME = 'accelera-v3'; // Increment version to force cache refresh
+const CACHE_NAME = 'accelera-v4'; // Increment version to force cache refresh
 const STATIC_ASSETS = [
   '/logo.svg',
   '/logo.png',

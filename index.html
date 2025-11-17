@@ -23,29 +23,42 @@
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
   <script>
-    // Register service worker with proper update handling
+    // Force unregister old service workers and register new one
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(reg => {
-            console.log('Service Worker registered');
-            
-            // Check for updates every time the page loads
-            reg.update();
-            
-            // Listen for updates
-            reg.addEventListener('updatefound', () => {
-              const newWorker = reg.installing;
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New service worker available, reload to activate
-                  console.log('New version available! Reloading...');
-                  window.location.reload();
-                }
-              });
+      window.addEventListener('load', async () => {
+        try {
+          // Unregister all existing service workers first
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (let registration of registrations) {
+            await registration.unregister();
+            console.log('Old service worker unregistered');
+          }
+          
+          // Clear all caches
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(name => caches.delete(name)));
+          console.log('All caches cleared');
+          
+          // Register new service worker
+          const reg = await navigator.serviceWorker.register('/sw.js');
+          console.log('New Service Worker registered');
+          
+          // Check for updates immediately
+          reg.update();
+          
+          // Listen for updates
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('New version available! Reloading...');
+                window.location.reload();
+              }
             });
-          })
-          .catch(err => console.log('Service Worker registration failed:', err));
+          });
+        } catch (err) {
+          console.log('Service Worker setup failed:', err);
+        }
       });
     }
   </script>
