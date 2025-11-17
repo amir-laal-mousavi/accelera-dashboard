@@ -120,13 +120,15 @@ const DailyView = memo(function DailyView() {
   const totalWorkoutMinutes = workouts?.reduce((sum, w) => sum + (w.duration || 0), 0) || 0;
   const totalReadingMinutes = readingSessions?.reduce((sum, s) => sum + s.minutes, 0) || 0;
 
-  // Prepare chart data - tasks by area
+  // Prepare chart data - tasks by area (sorted alphabetically for consistency)
   const tasksByArea = useMemo(() => {
     const areaCount: Record<string, number> = {};
     dailyTasks.forEach((task) => {
       areaCount[task.area] = (areaCount[task.area] || 0) + 1;
     });
-    return Object.entries(areaCount).map(([area, count]) => ({ area, count }));
+    return Object.entries(areaCount)
+      .map(([area, count]) => ({ area, count }))
+      .sort((a, b) => a.area.localeCompare(b.area));
   }, [dailyTasks]);
 
   // Time distribution pie chart
