@@ -7,7 +7,6 @@ import { StrictMode, useEffect, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./index.css";
-import Landing from "./pages/Landing.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import "./types/global.d.ts";
 import { Loader2 } from "lucide-react";
@@ -15,6 +14,7 @@ import { Loader2 } from "lucide-react";
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
 // Lazy load pages for better performance
+const Landing = lazy(() => import("./pages/Landing.tsx"));
 const AuthPage = lazy(() => import("@/pages/Auth.tsx"));
 const Dashboard = lazy(() => import("@/pages/Dashboard.tsx"));
 const Settings = lazy(() => import("@/pages/Settings.tsx"));
