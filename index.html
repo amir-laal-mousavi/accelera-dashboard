@@ -8,6 +8,9 @@
   <meta name="description" content="ACCELERA Planner - Your all-in-one productivity dashboard for tracking tasks, habits, health, and more" />
   <meta name="theme-color" content="#8b5cf6" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/logo.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -20,11 +23,28 @@
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
   <script>
-    // Register service worker
+    // Register service worker with proper update handling
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-          .then(reg => console.log('Service Worker registered'))
+          .then(reg => {
+            console.log('Service Worker registered');
+            
+            // Check for updates every time the page loads
+            reg.update();
+            
+            // Listen for updates
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New service worker available, reload to activate
+                  console.log('New version available! Reloading...');
+                  window.location.reload();
+                }
+              });
+            });
+          })
           .catch(err => console.log('Service Worker registration failed:', err));
       });
     }
