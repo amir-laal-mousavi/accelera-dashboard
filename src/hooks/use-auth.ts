@@ -4,6 +4,7 @@ import { useConvexAuth, useQuery } from "convex/react";
 
 import { useEffect, useState } from "react";
 
+// Hook order fix: useState must be called first
 export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
   
