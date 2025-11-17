@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Plus, Edit, CheckCircle2, Circle, Clock, Droplet, Moon, Dumbbell, Book as BookIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Edit, CheckCircle2, Circle, Clock, Droplet, Moon, Dumbbell, Book as BookIcon, Coffee, Trash2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { TaskForm } from "./TaskForm";
@@ -38,6 +38,10 @@ const DailyView = memo(function DailyView() {
 
   const toggleTaskDone = useMutation(api.tasks.update);
   const toggleHabitCompletion = useMutation(api.habits.toggleCompletion);
+  const deleteWaterLog = useMutation(api.health.deleteWater);
+  const deleteCaffeineLog = useMutation(api.health.deleteCaffeine);
+  const deleteSleepLog = useMutation(api.health.deleteSleep);
+  const deleteWorkoutLog = useMutation(api.workouts.remove);
 
   // Calculate date range for the selected day
   const { startOfDay, endOfDay } = useMemo(() => {
@@ -60,6 +64,10 @@ const DailyView = memo(function DailyView() {
     endDate: endOfDay,
   });
   const waterLogs = useQuery(api.health.listWater, {
+    startDate: startOfDay,
+    endDate: endOfDay,
+  });
+  const caffeineLogs = useQuery(api.health.listCaffeine, {
     startDate: startOfDay,
     endDate: endOfDay,
   });
@@ -117,6 +125,11 @@ const DailyView = memo(function DailyView() {
     if (!waterLogs || waterLogs.length === 0) return 0;
     return waterLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
   }, [waterLogs]);
+  
+  const totalCaffeine = useMemo(() => {
+    if (!caffeineLogs || caffeineLogs.length === 0) return 0;
+    return caffeineLogs.reduce((sum, log) => sum + (log.caffeine || 0), 0);
+  }, [caffeineLogs]);
   const totalWorkoutMinutes = workouts?.reduce((sum, w) => sum + (w.duration || 0), 0) || 0;
   const totalReadingMinutes = readingSessions?.reduce((sum, s) => sum + s.minutes, 0) || 0;
 
@@ -202,7 +215,7 @@ const DailyView = memo(function DailyView() {
       </Card>
 
       {/* Quick Stats with neon highlights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className="neon-card-hover">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Tasks</CardTitle>
@@ -223,6 +236,19 @@ const DailyView = memo(function DailyView() {
             <div className="text-2xl font-bold">{totalWater}ml</div>
             <p className="text-xs text-muted-foreground mt-1">
               Goal: {waterLogs && waterLogs.length > 0 && waterLogs[0]?.goal ? waterLogs[0].goal : 2000}ml
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="neon-card-hover">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Caffeine</CardTitle>
+            <Coffee className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalCaffeine}mg</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {caffeineLogs?.length || 0} drinks
             </p>
           </CardContent>
         </Card>
@@ -512,12 +538,33 @@ const DailyView = memo(function DailyView() {
                     key={workout._id}
                     className="p-3 rounded-lg border bg-card"
                   >
-                    <p className="font-medium">{workout.session}</p>
-                    <p className="text-sm text-muted-foreground">{workout.exercise}</p>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                      {workout.duration && <span>{workout.duration}min</span>}
-                      {workout.calories && <span>{workout.calories}cal</span>}
-                      {workout.intensity && <Badge variant="outline">{workout.intensity}</Badge>}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="font-medium">{workout.session}</p>
+                        <p className="text-sm text-muted-foreground">{workout.exercise}</p>
+                        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                          {workout.duration && <span>{workout.duration}min</span>}
+                          {workout.calories && <span>{workout.calories}cal</span>}
+                          {workout.intensity && <Badge variant="outline">{workout.intensity}</Badge>}
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={async () => {
+                          if (confirm("Delete this workout?")) {
+                            try {
+                              await deleteWorkoutLog({ id: workout._id });
+                              toast.success("Workout deleted");
+                            } catch (error) {
+                              toast.error("Failed to delete workout");
+                            }
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     </div>
                   </div>
                 ))
@@ -537,21 +584,115 @@ const DailyView = memo(function DailyView() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-2 rounded-lg border">
-                <div className="flex items-center gap-2">
-                  <Droplet className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium">Water</span>
+            <div className="space-y-2">
+              {/* Water Logs */}
+              {waterLogs && waterLogs.length > 0 ? (
+                waterLogs.map((log) => (
+                  <div key={log._id} className="flex items-center justify-between p-2 rounded-lg border">
+                    <div className="flex items-center gap-2">
+                      <Droplet className="h-4 w-4 text-blue-500" />
+                      <span className="text-sm font-medium">{log.amount}ml</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={async () => {
+                        if (confirm("Delete this water log?")) {
+                          try {
+                            await deleteWaterLog({ id: log._id });
+                            toast.success("Water log deleted");
+                          } catch (error) {
+                            toast.error("Failed to delete water log");
+                          }
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center justify-between p-2 rounded-lg border">
+                  <div className="flex items-center gap-2">
+                    <Droplet className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm font-medium">Water</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">0ml</span>
                 </div>
-                <span className="text-sm font-semibold">{totalWater}ml</span>
-              </div>
-              {sleepLogs && sleepLogs.length > 0 && (
+              )}
+
+              {/* Caffeine Logs */}
+              {caffeineLogs && caffeineLogs.length > 0 ? (
+                caffeineLogs.map((log) => (
+                  <div key={log._id} className="flex items-center justify-between p-2 rounded-lg border">
+                    <div className="flex items-center gap-2">
+                      <Coffee className="h-4 w-4 text-amber-500" />
+                      <span className="text-sm font-medium">{log.drink} ({log.caffeine}mg)</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={async () => {
+                        if (confirm("Delete this caffeine log?")) {
+                          try {
+                            await deleteCaffeineLog({ id: log._id });
+                            toast.success("Caffeine log deleted");
+                          } catch (error) {
+                            toast.error("Failed to delete caffeine log");
+                          }
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center justify-between p-2 rounded-lg border">
+                  <div className="flex items-center gap-2">
+                    <Coffee className="h-4 w-4 text-amber-500" />
+                    <span className="text-sm font-medium">Caffeine</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">0mg</span>
+                </div>
+              )}
+
+              {/* Sleep Logs */}
+              {sleepLogs && sleepLogs.length > 0 ? (
+                sleepLogs.map((log) => (
+                  <div key={log._id} className="flex items-center justify-between p-2 rounded-lg border">
+                    <div className="flex items-center gap-2">
+                      <Moon className="h-4 w-4 text-purple-500" />
+                      <span className="text-sm font-medium">{log.duration}h</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={async () => {
+                        if (confirm("Delete this sleep log?")) {
+                          try {
+                            await deleteSleepLog({ id: log._id });
+                            toast.success("Sleep log deleted");
+                          } catch (error) {
+                            toast.error("Failed to delete sleep log");
+                          }
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))
+              ) : (
                 <div className="flex items-center justify-between p-2 rounded-lg border">
                   <div className="flex items-center gap-2">
                     <Moon className="h-4 w-4 text-purple-500" />
                     <span className="text-sm font-medium">Sleep</span>
                   </div>
-                  <span className="text-sm font-semibold">{sleepLogs[0].duration}h</span>
+                  <span className="text-sm text-muted-foreground">0h</span>
                 </div>
               )}
             </div>
