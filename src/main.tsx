@@ -12,7 +12,50 @@ import "./types/global.d.ts";
 import { Loader2 } from "lucide-react";
 import { AuthProvider } from "@/contexts/AuthContext.tsx";
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+// Defer Convex client creation to runtime and guard missing envs
+function RootApp() {
+  const convexUrl = import.meta.env.VITE_CONVEX_URL as string | undefined;
+  if (!convexUrl) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 text-center">
+        <div>
+          <p className="text-lg font-semibold">Missing Convex URL</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Please set VITE_CONVEX_URL in Integrations or API Keys to load the app.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  const convex = new ConvexReactClient(convexUrl);
+  return (
+    <>
+      <VlyToolbar />
+      <InstrumentationProvider>
+        <ConvexAuthProvider client={convex}>
+          <AuthProvider>
+            <BrowserRouter>
+              <RouteSyncer />
+              <Suspense fallback={<LoadingFallback />}>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/auth" element={<AuthPage redirectAfterAuth="/dashboard" />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/admin/users" element={<UserManagement />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+            <Toaster />
+          </AuthProvider>
+        </ConvexAuthProvider>
+      </InstrumentationProvider>
+    </>
+  );
+}
 
 // Lazy load pages for better performance
 const Landing = lazy(() => import("./pages/Landing.tsx"));
@@ -53,27 +96,6 @@ const LoadingFallback = () => (
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <VlyToolbar />
-    <InstrumentationProvider>
-      <ConvexAuthProvider client={convex}>
-        <AuthProvider>
-          <BrowserRouter>
-            <RouteSyncer />
-            <Suspense fallback={<LoadingFallback />}>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/auth" element={<AuthPage redirectAfterAuth="/dashboard" />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/users" element={<UserManagement />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-          <Toaster />
-        </AuthProvider>
-      </ConvexAuthProvider>
-    </InstrumentationProvider>
+    <RootApp />
   </StrictMode>,
 );
