@@ -41,14 +41,6 @@ export default function Dashboard() {
   useEffect(() => {
     setIsInitialized(true);
   }, []);
-  
-  // Filter states
-  const [taskAreaFilter, setTaskAreaFilter] = useState<string>("all");
-  const [taskStatusFilter, setTaskStatusFilter] = useState<string>("all");
-  const [taskPriorityFilter, setTaskPriorityFilter] = useState<string>("all");
-  const [expenseCategoryFilter, setExpenseCategoryFilter] = useState<string>("all");
-  const [habitFrequencyFilter, setHabitFrequencyFilter] = useState<string>("all");
-  const [bookStatusFilter, setBookStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
